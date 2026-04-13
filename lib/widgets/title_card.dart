@@ -1,3 +1,4 @@
+import 'package:buget_flow/theme/app_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,7 @@ class TitleCard extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1F242D), // surfaceVariant
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
