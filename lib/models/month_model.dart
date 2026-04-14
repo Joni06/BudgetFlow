@@ -4,12 +4,14 @@ import 'transaction_model.dart';
 class MonthModel {
   final int month;
   final double budget;
+  final double income;
   final List<CategoryModel> categories;
   final List<TransactionModel> transactions;
 
-  const MonthModel({
+  MonthModel({
     required this.month,
     required this.budget,
+    required this.income,
     required this.categories,
     required this.transactions,
   });
@@ -18,6 +20,7 @@ class MonthModel {
     return MonthModel(
       month: month,
       budget: 0.0,
+      income: 0.0,
       categories: [],
       transactions: [],
     );
@@ -32,6 +35,7 @@ class MonthModel {
     return MonthModel(
       month: month ?? this.month,
       budget: budget ?? this.budget,
+      income: income ?? this.income,
       categories: categories ?? this.categories,
       transactions: transactions ?? this.transactions,
     );
@@ -41,6 +45,7 @@ class MonthModel {
     return {
       'month': month,
       'budget': budget,
+      'income': income,
       'categories': categories.map((c) => c.toJson()).toList(),
       'transactions': transactions.map((t) => t.toJson()).toList(),
     };
@@ -50,6 +55,7 @@ class MonthModel {
     return MonthModel(
       month: json['month'],
       budget: (json['budget'] as num).toDouble(),
+      income: (json['income'] as num).toDouble(),
       categories: (json['categories'] as List)
           .map((c) => CategoryModel.fromJson(c))
           .toList(),

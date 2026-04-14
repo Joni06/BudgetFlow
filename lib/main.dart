@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const HomeView(title: 'Budget Flow', years: []),
+      home: HomeView(title: 'Budget Flow', years: [], categories: []),
     );
   }
 }

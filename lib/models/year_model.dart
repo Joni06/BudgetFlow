@@ -4,7 +4,7 @@ class YearModel {
   final int year;
   final Map<int, MonthModel> months;
 
-  const YearModel({
+  YearModel({
     required this.year,
     required this.months,
   });

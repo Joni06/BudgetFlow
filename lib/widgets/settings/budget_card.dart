@@ -1,8 +1,7 @@
 import 'package:buget_flow/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
-
-class BudgetCard extends StatelessWidget{
+class BudgetCard extends StatelessWidget {
   final String title;
   final double budget;
 
@@ -18,10 +17,7 @@ class BudgetCard extends StatelessWidget{
         return AlertDialog(
           title: Text(
             'Edit',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -62,16 +58,17 @@ class BudgetCard extends StatelessWidget{
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel',),
+              child: Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
                 final newTitle = titleController.text;
-                final newBudget = double.tryParse(budgetController.text) ?? budget;
+                final newBudget =
+                    double.tryParse(budgetController.text) ?? budget;
 
                 Navigator.pop(context);
               },
-              child: Text('OK',),
+              child: Text('OK'),
             ),
           ],
           backgroundColor: AppTheme.surface,
@@ -104,27 +101,18 @@ class BudgetCard extends StatelessWidget{
         children: [
           Text(
             title,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 '${budget.toStringAsFixed(2)} €',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               const SizedBox(width: 8),
               IconButton(
-                icon: Icon(
-                  Icons.edit,
-                  color: AppTheme.primary,
-                ),
+                icon: Icon(Icons.edit, color: AppTheme.primary),
                 onPressed: () {
                   _showEditDialog(context);
                 },

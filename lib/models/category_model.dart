@@ -4,22 +4,17 @@ class CategoryModel {
   final String name;
   final double monthlyBudget;
 
-  const CategoryModel({
+  CategoryModel({
     required this.id,
-    required this.version,
+    this.version = 0,
     required this.name,
     required this.monthlyBudget,
   });
 
-  CategoryModel copyWith({
-    int? id,
-    int? version,
-    String? name,
-    double? monthlyBudget,
-  }) {
+  CategoryModel copyWith({String? name, double? monthlyBudget}) {
     return CategoryModel(
-      id: id ?? this.id,
-      version: version ?? this.version,
+      id: this.id,
+      version: this.version + 1,
       name: name ?? this.name,
       monthlyBudget: monthlyBudget ?? this.monthlyBudget,
     );

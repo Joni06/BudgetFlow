@@ -1,4 +1,5 @@
 class TransactionModel {
+  static int _currentId = 0;
   final int id;
   final double amount;
   final String note;
@@ -7,18 +8,17 @@ class TransactionModel {
   final DateTime date;
   final bool repeatMonthly;
 
-  const TransactionModel({
-    required this.id,
+  TransactionModel({
+    int? id,
     required this.amount,
     required this.note,
     required this.categoryId,
     required this.categoryVersion,
     required this.date,
     required this.repeatMonthly,
-  });
+  }) : id = id ?? _currentId++;
 
   TransactionModel copyWith({
-    int? id,
     double? amount,
     String? note,
     int? categoryId,
@@ -27,7 +27,7 @@ class TransactionModel {
     bool? repeatMonthly,
   }) {
     return TransactionModel(
-      id: id ?? this.id,
+      id: id,
       amount: amount ?? this.amount,
       note: note ?? this.note,
       categoryId: categoryId ?? this.categoryId,
@@ -50,7 +50,7 @@ class TransactionModel {
   }
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
     return TransactionModel(
-      id: json['id'],
+      id: json['id'] as int,
       amount: (json['amount'] as num).toDouble(),
       note: json['note'],
       categoryId: json['categoryId'],
