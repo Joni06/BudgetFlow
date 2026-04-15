@@ -1,4 +1,4 @@
-import 'package:buget_flow/models/category_model.dart';
+import 'package:buget_flow/models/category_structure_model.dart';
 import 'package:buget_flow/theme/app_theme.dart';
 import 'package:buget_flow/views/settings/settings_view.dart';
 import 'package:buget_flow/widgets/settings/budget_card.dart';
@@ -11,7 +11,7 @@ import '../widgets/title_card.dart';
 class HomeView extends StatelessWidget {
   final String title;
   final List<YearModel> years;
-  final List<CategoryModel> categories;
+  final List<CategoryStructureModel> categories;
 
   HomeView({
     super.key,
@@ -21,17 +21,17 @@ class HomeView extends StatelessWidget {
   });
 
   final testCategories = [
-    CategoryModel(
+    CategoryStructureModel(
       id: 1,
       name: 'Lebensmittel',
       monthlyBudget: 400.0,
     ),
-    CategoryModel(
+    CategoryStructureModel(
       id: 2,
       name: 'Miete & Wohnen',
       monthlyBudget: 850.0,
     ),
-    CategoryModel(
+    CategoryStructureModel(
       id: 3,
       name: 'Freizeit & Hobby',
       monthlyBudget: 150.0,
@@ -75,7 +75,7 @@ class HomeView extends StatelessWidget {
         backgroundColor: AppTheme.primaryContainer,
         child: const Icon(Icons.add, color: AppTheme.textPrimary),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
     );
   }
 }

@@ -1,13 +1,13 @@
-import 'package:buget_flow/models/category_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import '../../logic/search_newest_version.dart';
-import '../../models/transaction_model.dart';
+import '../../logic/add_transaction.dart';
+import '../../models/category_structure_model.dart';
 import '../../theme/app_theme.dart';
 
 void showAddTransactionDialog(
   BuildContext context,
-  List<CategoryModel> categories,
+  List<CategoryStructureModel> categories,
 ) {
   showDialog(
     context: context,
@@ -16,7 +16,7 @@ void showAddTransactionDialog(
 }
 
 class AddTransactionDialog extends StatefulWidget {
-  final List<CategoryModel> categories;
+  final List<CategoryStructureModel> categories;
 
   const AddTransactionDialog({super.key, required this.categories});
 
@@ -27,7 +27,7 @@ class AddTransactionDialog extends StatefulWidget {
 class _AddTransactionDialogState extends State<AddTransactionDialog> {
   final amountController = TextEditingController(text: '-');
   final noteController = TextEditingController();
-  CategoryModel? selectedCategory;
+  CategoryStructureModel? selectedCategory;
   DateTime selectedDate = DateTime.now();
   bool isRepeatMonthly = false;
 
@@ -49,7 +49,12 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildTextField(amountController, 'Enter amount', suffix: '€'),
+            _buildTextField(
+              amountController,
+              'Enter amount',
+              suffix: '€',
+              numberOnly: true,
+            ),
             const SizedBox(height: 12),
 
             _buildTextField(noteController, 'Enter note'),
@@ -83,9 +88,13 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     TextEditingController controller,
     String hint, {
     String? suffix,
+    bool numberOnly = false,
   }) {
     return TextField(
       controller: controller,
+      inputFormatters: numberOnly
+          ? [FilteringTextInputFormatter.allow(RegExp(r'^[+-]?\d*[,]?\d{0,2}'))]
+          : null,
       decoration: InputDecoration(
         hintText: hint,
         suffixText: suffix,
@@ -100,7 +109,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   }
 
   Widget _buildDropdown() {
-    return DropdownButtonFormField<CategoryModel>(
+    return DropdownButtonFormField<CategoryStructureModel>(
       initialValue: selectedCategory,
       borderRadius: BorderRadius.circular(12),
       isExpanded: true,
@@ -155,24 +164,21 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
 
   void _submit() {
     final amount = double.tryParse(amountController.text);
-    if (amount == null || selectedCategory == null) {
-      //TODO add null check also for selectedCategory
+    final note = noteController.text;
+    final category = selectedCategory;
+    final date = selectedDate;
+
+    if (amount == null || category == null) {
       return;
     }
-    final int categoryVersion = searchNewestVersion(
-      categoryId: selectedCategory!.id,
-      categories: widget.categories,
-    );
 
-    TransactionModel transaction = TransactionModel(
+    addTransaction(
       amount: amount,
       note: noteController.text,
       categoryId: selectedCategory!.id,
-      categoryVersion: categoryVersion,
       date: selectedDate,
       repeatMonthly: isRepeatMonthly,
     );
-
     Navigator.pop(context);
   }
 }

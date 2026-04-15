@@ -1,8 +1,8 @@
-import 'category_model.dart';
+import 'category_structure_model.dart';
 
 class SettingsModel {
   final double monthlyIncome;
-  List<CategoryModel> categories;
+  List<CategoryStructureModel> categories;
 
   SettingsModel({
     required this.monthlyIncome,

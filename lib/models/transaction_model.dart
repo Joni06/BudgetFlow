@@ -1,10 +1,8 @@
 class TransactionModel {
-  static int _currentId = 0;
   final int id;
   final double amount;
   final String note;
   final int categoryId;
-  final int categoryVersion;
   final DateTime date;
   final bool repeatMonthly;
 
@@ -13,10 +11,9 @@ class TransactionModel {
     required this.amount,
     required this.note,
     required this.categoryId,
-    required this.categoryVersion,
     required this.date,
     required this.repeatMonthly,
-  }) : id = id ?? _currentId++;
+  }) : id = id ?? DateTime.now().millisecondsSinceEpoch;
 
   TransactionModel copyWith({
     double? amount,
@@ -31,7 +28,6 @@ class TransactionModel {
       amount: amount ?? this.amount,
       note: note ?? this.note,
       categoryId: categoryId ?? this.categoryId,
-      categoryVersion: categoryVersion ?? this.categoryVersion,
       date: date ?? this.date,
       repeatMonthly: repeatMonthly ?? this.repeatMonthly,
     );
@@ -43,7 +39,6 @@ class TransactionModel {
       'amount': amount,
       'note': note,
       'categoryId': categoryId,
-      'categoryVersion': categoryVersion,
       'date': date,
       'repeatMonthly': repeatMonthly
     };
@@ -54,7 +49,6 @@ class TransactionModel {
       amount: (json['amount'] as num).toDouble(),
       note: json['note'],
       categoryId: json['categoryId'],
-      categoryVersion: json['categoryVersion'],
       date: DateTime.parse(json['date']),
       repeatMonthly: json['repeatMonthly'],
     );
