@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
-import '../../logic/add_transaction.dart';
+import '../../logic/budget_provider.dart';
 import '../../models/category_structure_model.dart';
+import '../../models/transaction_model.dart';
 import '../../theme/app_theme.dart';
 
 void showAddTransactionDialog(
@@ -27,6 +29,7 @@ class AddTransactionDialog extends StatefulWidget {
 class _AddTransactionDialogState extends State<AddTransactionDialog> {
   final amountController = TextEditingController(text: '-');
   final noteController = TextEditingController();
+  final dateController = TextEditingController();
   CategoryStructureModel? selectedCategory;
   DateTime selectedDate = DateTime.now();
   bool isRepeatMonthly = false;
@@ -35,15 +38,22 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   void dispose() {
     amountController.dispose();
     noteController.dispose();
+    dateController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text(
+      backgroundColor: AppTheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text(
         'Add Transaction',
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: AppTheme.textPrimary,
+        ),
       ),
       content: SingleChildScrollView(
         child: Column(
@@ -63,23 +73,32 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             _buildDropdown(),
             const SizedBox(height: 12),
 
-            _buildDateField(),
+            _buildDateField(dateController),
             const SizedBox(height: 12),
 
-            SwitchListTile(
-              value: isRepeatMonthly,
-              onChanged: (value) => setState(() => isRepeatMonthly = value),
-              title: const Text('Repeat Monthly'),
-            ),
+            _buildSwitch(),
           ],
         ),
       ),
+      actionsPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text(
+            'Cancel',
+            style: TextStyle(color: AppTheme.textSecondary),
+          ),
         ),
-        TextButton(onPressed: _submit, child: const Text('OK')),
+        TextButton(
+          onPressed: _submit,
+          child: Text(
+            'Add',
+            style: TextStyle(
+              color: AppTheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -92,11 +111,17 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   }) {
     return TextField(
       controller: controller,
+      style: TextStyle(color: AppTheme.textPrimary),
       inputFormatters: numberOnly
-          ? [FilteringTextInputFormatter.allow(RegExp(r'^[+-]?\d*[,]?\d{0,2}'))]
+          ? [
+              FilteringTextInputFormatter.allow(
+                RegExp(r'^[+-]?\d*[,.]?\d{0,2}'),
+              ),
+            ]
           : null,
       decoration: InputDecoration(
         hintText: hint,
+        hintStyle: TextStyle(color: AppTheme.textSecondary),
         suffixText: suffix,
         filled: true,
         fillColor: AppTheme.surfaceVariant,
@@ -122,6 +147,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 15),
       ),
       items: widget.categories.map((category) {
         return DropdownMenuItem(value: category, child: Text(category.name));
@@ -132,16 +158,18 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     );
   }
 
-  Widget _buildDateField() {
+  Widget _buildDateField(TextEditingController controller) {
     return TextField(
       readOnly: true,
-      controller: TextEditingController(
-        text: selectedDate.toString().split(' ')[0],
-      ),
+      controller: controller,
       decoration: InputDecoration(
+        hintText: selectedDate.toString().split(' ')[0],
         filled: true,
         fillColor: AppTheme.surfaceVariant,
-        suffixIcon: const Icon(Icons.calendar_today),
+        suffixIcon: const Icon(
+          Icons.calendar_today,
+          color: AppTheme.textSecondary,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -151,10 +179,9 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
         final picked = await showDatePicker(
           context: context,
           initialDate: selectedDate,
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2101),
+          firstDate: DateTime(2020),
+          lastDate: DateTime(2100),
         );
-
         if (picked != null) {
           setState(() => selectedDate = picked);
         }
@@ -162,23 +189,77 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     );
   }
 
+  Widget _buildSwitch() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceVariant,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      //padding: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.fromLTRB(16, 3, 8, 3),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Repeat Monthly',
+            style: TextStyle(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Transform.scale(
+            scale: 0.8,
+            child: Switch(
+              value: isRepeatMonthly,
+              onChanged: (value) => setState(() => isRepeatMonthly = value),
+              activeThumbColor: AppTheme.primary,
+              inactiveThumbColor: AppTheme.textSecondary,
+              inactiveTrackColor: AppTheme.surfaceVariant,
+              trackOutlineColor: WidgetStateProperty.resolveWith<Color?>((
+                states,
+              ) {
+                if (!states.contains(WidgetState.selected)) {
+                  return AppTheme.textSecondary;
+                }
+                return AppTheme.primary;
+              }),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _submit() {
-    final amount = double.tryParse(amountController.text);
+    final amountText = amountController.text.replaceAll(',', '.');
+    final amount = double.tryParse(amountText);
+
     final note = noteController.text;
     final category = selectedCategory;
     final date = selectedDate;
 
     if (amount == null || category == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter an amount and select a category'),
+        ),
+      );
       return;
     }
 
-    addTransaction(
+    final newTransaction = TransactionModel(
       amount: amount,
-      note: noteController.text,
-      categoryId: selectedCategory!.id,
-      date: selectedDate,
+      note: note,
+      categoryId: category.id,
+      date: date,
       repeatMonthly: isRepeatMonthly,
     );
+
+    Provider.of<BudgetProvider>(
+      context,
+      listen: false,
+    ).addTransaction(newTransaction);
+
     Navigator.pop(context);
   }
 }

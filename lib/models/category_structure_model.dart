@@ -1,20 +1,17 @@
 class CategoryStructureModel {
   final int id;
-  final int version;
   final String name;
   final double monthlyBudget;
 
   CategoryStructureModel({
-    required this.id,
-    this.version = 0,
+    int ? id,
     required this.name,
     required this.monthlyBudget,
-  });
+  }): id = id ?? DateTime.now().millisecondsSinceEpoch;
 
   CategoryStructureModel copyWith({String? name, double? monthlyBudget}) {
     return CategoryStructureModel(
-      id: this.id,
-      version: this.version + 1,
+      id: id,
       name: name ?? this.name,
       monthlyBudget: monthlyBudget ?? this.monthlyBudget,
     );
@@ -23,7 +20,6 @@ class CategoryStructureModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'version': version,
       'name': name,
       'monthlyBudget': monthlyBudget,
     };
@@ -32,7 +28,6 @@ class CategoryStructureModel {
   factory CategoryStructureModel.fromJson(Map<String, dynamic> json) {
     return CategoryStructureModel(
       id: json['id'],
-      version: json['version'],
       name: json['name'],
       monthlyBudget: (json['monthlyBudget'] as num).toDouble(),
     );

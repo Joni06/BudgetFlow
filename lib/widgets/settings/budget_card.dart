@@ -1,11 +1,20 @@
 import 'package:buget_flow/theme/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class BudgetCard extends StatelessWidget {
   final String title;
   final double budget;
+  final Color? color;
+  final bool shadow;
 
-  const BudgetCard({super.key, required this.title, required this.budget});
+  const BudgetCard({
+    super.key,
+    required this.title,
+    required this.budget,
+    this.color,
+    this.shadow = true,
+  });
 
   void _showEditDialog(BuildContext context) {
     final titleController = TextEditingController(text: title);
@@ -17,17 +26,15 @@ class BudgetCard extends StatelessWidget {
         return AlertDialog(
           title: Text(
             'Edit',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: titleController,
-                keyboardType: TextInputType.text,
-                style: TextStyle(color: AppTheme.textPrimary),
                 decoration: InputDecoration(
-                  hintText: 'Enter new title',
+                  hintText: 'New Title',
                   hintStyle: TextStyle(color: AppTheme.textSecondary),
                   filled: true,
                   fillColor: AppTheme.surfaceVariant,
@@ -39,12 +46,16 @@ class BudgetCard extends StatelessWidget {
               ),
               SizedBox(height: 12),
               TextField(
-                controller: budgetController,
-                keyboardType: TextInputType.number,
+                style: TextStyle(color: AppTheme.textPrimary),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                    RegExp(r'^[+-]?\d*[,.]?\d{0,2}'),
+                  ),
+                ],
                 decoration: InputDecoration(
-                  hintText: 'Enter new budget',
+                  hintText: "New Budget",
                   hintStyle: TextStyle(color: AppTheme.textSecondary),
-                  suffixText: '€',
+                  suffixText: "€",
                   filled: true,
                   fillColor: AppTheme.surfaceVariant,
                   border: OutlineInputBorder(
@@ -62,6 +73,7 @@ class BudgetCard extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
+                //TODO
                 final newTitle = titleController.text;
                 final newBudget =
                     double.tryParse(budgetController.text) ?? budget;
@@ -83,17 +95,18 @@ class BudgetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(10, 8, 10, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
       decoration: BoxDecoration(
-        color: AppTheme.surface,
+        color: color ?? AppTheme.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
+          if (shadow)
+            BoxShadow(
+              color: Colors.black.withValues(),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
         ],
       ),
       child: Row(
@@ -101,18 +114,20 @@ class BudgetCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
           ),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 '${budget.toStringAsFixed(2)} €',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 4),
               IconButton(
-                icon: Icon(Icons.edit, color: AppTheme.primary),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: Icon(Icons.edit, size: 20, color: AppTheme.primary),
                 onPressed: () {
                   _showEditDialog(context);
                 },

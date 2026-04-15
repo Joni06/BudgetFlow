@@ -1,5 +1,4 @@
 import 'package:buget_flow/theme/app_theme.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class TitleCard extends StatelessWidget {
@@ -18,7 +17,7 @@ class TitleCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(),
-            blurRadius: 8,
+            blurRadius: 4,
             offset: const Offset(0, 2),
           ),
         ],
@@ -26,7 +25,7 @@ class TitleCard extends StatelessWidget {
       child: Text(
         title,
         style: const TextStyle(
-          fontSize: 24,
+          fontSize: 20,
           fontWeight: FontWeight.bold,
           color: Color(0xFFDCE1EB), // textPrimary
           letterSpacing: 0.5,

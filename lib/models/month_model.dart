@@ -4,12 +4,14 @@ class MonthModel {
   final int month;
   final double budget;
   final double income;
+  final double spent;
   final List<CategoryModel> categories;
 
   MonthModel({
     required this.month,
     required this.budget,
     required this.income,
+    required this.spent,
     required this.categories,
   });
 
@@ -18,6 +20,7 @@ class MonthModel {
       month: month,
       budget: 0.0,
       income: 0.0,
+      spent: 0.0,
       categories: [],
     );
   }
@@ -26,12 +29,14 @@ class MonthModel {
     int? month,
     double? budget,
     double? income,
+    double? spent,
     List<CategoryModel>? categories,
   }) {
     return MonthModel(
       month: month ?? this.month,
       budget: budget ?? this.budget,
       income: income ?? this.income,
+      spent: spent ?? this.spent,
       categories: categories ?? this.categories,
     );
   }
@@ -41,6 +46,7 @@ class MonthModel {
       'month': month,
       'budget': budget,
       'income': income,
+      'spent': spent,
       'categories': categories.map((c) => c.toJson()).toList(),
     };
   }
@@ -50,6 +56,7 @@ class MonthModel {
       month: json['month'],
       budget: (json['budget'] as num).toDouble(),
       income: (json['income'] as num).toDouble(),
+      spent: (json['spent'] as num).toDouble(),
       categories: (json['categories'] as List)
           .map((c) => CategoryModel.fromJson(c))
           .toList(),

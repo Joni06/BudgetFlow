@@ -1,45 +1,30 @@
-import 'package:buget_flow/models/category_structure_model.dart';
 import 'package:buget_flow/theme/app_theme.dart';
 import 'package:buget_flow/views/settings/settings_view.dart';
 import 'package:buget_flow/widgets/settings/budget_card.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../models/year_model.dart';
+import '../logic/budget_provider.dart';
+import '../logic/settings_provider.dart';
 import '../widgets/dialogs/add_transaction_dialog.dart';
 import '../widgets/title_card.dart';
 
 class HomeView extends StatelessWidget {
   final String title;
-  final List<YearModel> years;
-  final List<CategoryStructureModel> categories;
 
-  HomeView({
-    super.key,
-    required this.title,
-    required this.years,
-    required this.categories,
-  });
-
-  final testCategories = [
-    CategoryStructureModel(
-      id: 1,
-      name: 'Lebensmittel',
-      monthlyBudget: 400.0,
-    ),
-    CategoryStructureModel(
-      id: 2,
-      name: 'Miete & Wohnen',
-      monthlyBudget: 850.0,
-    ),
-    CategoryStructureModel(
-      id: 3,
-      name: 'Freizeit & Hobby',
-      monthlyBudget: 150.0,
-    ),
-  ];
+  const HomeView({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
+    final budgetProv = context.watch<BudgetProvider>();
+    final settingsProv = context.watch<SettingsProvider>();
+
+    if (budgetProv.isLoading || settingsProv.isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    final categories = settingsProv.settings?.categories ?? [];
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -61,16 +46,18 @@ class HomeView extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          ...testCategories.map((category) {
-            return BudgetCard(title: category.name, budget: category.monthlyBudget,);
-          }).toList(),
+          ...categories.map((category) {
+            return BudgetCard(
+              title: category.name,
+              budget: category.monthlyBudget,
+            );
+          }),
           const TitleCard(title: 'Transactions'),
-
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showAddTransactionDialog(context, testCategories);
+          showAddTransactionDialog(context, categories);
         },
         backgroundColor: AppTheme.primaryContainer,
         child: const Icon(Icons.add, color: AppTheme.textPrimary),

@@ -1,9 +1,25 @@
 import 'package:buget_flow/theme/app_theme.dart';
 import 'package:buget_flow/views/home_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'logic/budget_provider.dart';
+import 'logic/settings_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
+        ChangeNotifierProxyProvider<SettingsProvider, BudgetProvider>(
+          create: (_) => BudgetProvider(),
+          update: (context, settingsProv, budgetProv) =>
+          budgetProv!..updateSettings(settingsProv),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -14,7 +30,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: HomeView(title: 'Budget Flow', years: [], categories: []),
+      home: const HomeView(title: 'Budget Flow'),
     );
   }
 }
