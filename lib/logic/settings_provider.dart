@@ -67,6 +67,14 @@ class SettingsProvider extends ChangeNotifier {
     saveSettings();
   }
 
+  void updateCategory(CategoryStructureModel cat, String newName, double newBudget) {
+    cat.name = newName;
+    cat.monthlyBudget = newBudget;
+
+    notifyListeners();
+    saveSettings();
+  }
+
   void updateIncome(double newIncome) {
     final currentSettings = _settings;
     if (currentSettings == null) return;

@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import '../logic/budget_provider.dart';
 import '../logic/settings_provider.dart';
 import '../widgets/dialogs/add_transaction_dialog.dart';
-import '../widgets/title_card.dart';
 
 class HomeView extends StatelessWidget {
   final String title;
@@ -23,7 +22,7 @@ class HomeView extends StatelessWidget {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final categories = settingsProv.settings?.categories ?? [];
+    final years = budgetProv.years;
 
     return Scaffold(
       appBar: AppBar(
@@ -44,20 +43,29 @@ class HomeView extends StatelessWidget {
           ),
         ],
       ),
-      body: ListView(
-        children: [
-          ...categories.map((category) {
-            return BudgetCard(
-              title: category.name,
-              budget: category.monthlyBudget,
-            );
-          }),
-          const TitleCard(title: 'Transactions'),
-        ],
-      ),
+      body: years.isNotEmpty
+          ? const Center(child: Text('No data available'))
+          : ListView.builder(
+              itemCount: years.length,
+              itemBuilder: (context, index) {
+                final year = years[index];
+
+                double yearlySpend = 0;
+
+                year.months.forEach((month, monthObj) {
+                  yearlySpend += monthObj.spent;
+                });
+
+                return BudgetCard(
+                  title: year.year.toString(),
+                  budget: yearlySpend,
+                  onUpdate: (String newTitle, double newBudget) {},
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showAddTransactionDialog(context, categories);
+          showAddTransactionDialog(context);
         },
         backgroundColor: AppTheme.primaryContainer,
         child: const Icon(Icons.add, color: AppTheme.textPrimary),

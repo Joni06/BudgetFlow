@@ -23,6 +23,7 @@ class BudgetProvider extends ChangeNotifier {
 
   void updateSettings(SettingsProvider settings) {
     _settingsProvider = settings;
+    notifyListeners();
   }
 
   //read json

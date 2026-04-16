@@ -8,12 +8,12 @@ class CategoryModel {
   final List<TransactionModel> transactions;
 
   CategoryModel({
-    int? id,
+    required this.id,
     required this.name,
     required this.monthlyBudget,
     required this.spent,
     required this.transactions,
-  }) : id = id ?? DateTime.now().millisecondsSinceEpoch;
+  });
 
   CategoryModel copyWith({
     int? id,
@@ -21,7 +21,7 @@ class CategoryModel {
     double? monthlyBudget,
     double? spent,
     List<TransactionModel>? transactions,
-  }){
+  }) {
     return CategoryModel(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -43,13 +43,13 @@ class CategoryModel {
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
-        id: json['id'],
-        name: json['name'],
-        monthlyBudget: (json['monthlyBudget'] as num).toDouble(),
-        spent: (json['spent'] as num).toDouble(),
-        transactions: (json['transactions'] as List)
-            .map((t) => TransactionModel.fromJson(t))
-            .toList(),
+      id: json['id'],
+      name: json['name'],
+      monthlyBudget: (json['monthlyBudget'] as num).toDouble(),
+      spent: (json['spent'] as num).toDouble(),
+      transactions: (json['transactions'] as List)
+          .map((t) => TransactionModel.fromJson(t))
+          .toList(),
     );
   }
 }

@@ -7,6 +7,7 @@ import '../../widgets/settings/budget_card.dart';
 
 class SettingsView extends StatelessWidget {
   final String title;
+
   const SettingsView({super.key, required this.title});
 
   @override
@@ -39,9 +40,9 @@ class SettingsView extends StatelessWidget {
               ],
             ),
             child: Theme(
-              data: Theme.of(context).copyWith(
-                dividerColor: Colors.transparent,
-              ),
+              data: Theme.of(
+                context,
+              ).copyWith(dividerColor: Colors.transparent),
               child: ExpansionTile(
                 tilePadding: const EdgeInsets.symmetric(horizontal: 16),
                 title: Text(
@@ -55,12 +56,21 @@ class SettingsView extends StatelessWidget {
                 iconColor: AppTheme.primary,
                 collapsedIconColor: AppTheme.textSecondary,
                 children: [
-                  ...categories.map((cat) => BudgetCard(
-                    title: cat.name,
-                    budget: cat.monthlyBudget,
-                    color: AppTheme.surfaceVariant,
-                    shadow: false,
-                  )),
+                  ...categories.map(
+                    (cat) => BudgetCard(
+                      title: cat.name,
+                      budget: cat.monthlyBudget,
+                      color: AppTheme.surfaceVariant,
+                      shadow: false,
+                      onUpdate: (newTitle, newBudget) {
+                        context.read<SettingsProvider>().updateCategory(
+                          cat,
+                          newTitle,
+                          newBudget,
+                        );
+                      },
+                    ),
+                  ),
                   Padding(
                     padding: const EdgeInsets.all(10),
                     child: GestureDetector(
@@ -111,9 +121,7 @@ class SettingsView extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: AppTheme.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -133,6 +141,7 @@ class SettingsView extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             TextField(
+              controller: budgetController,
               style: TextStyle(color: AppTheme.textPrimary),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(
@@ -156,17 +165,21 @@ class SettingsView extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("Cancel", style: TextStyle(color: AppTheme.textSecondary)),
+            child: Text(
+              "Cancel",
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
           ),
           TextButton(
             onPressed: () {
               final name = nameController.text;
-              final budget =
-                  double.tryParse(budgetController.text) ?? 0.0;
+              final budget = double.tryParse(budgetController.text) ?? 0.0;
 
               if (name.isNotEmpty) {
-                Provider.of<SettingsProvider>(context, listen: false)
-                    .addCategoryTemplate(name, budget);
+                Provider.of<SettingsProvider>(
+                  context,
+                  listen: false,
+                ).addCategoryTemplate(name, budget);
                 Navigator.pop(context);
               }
             },

@@ -1,7 +1,7 @@
 class CategoryStructureModel {
   final int id;
-  final String name;
-  final double monthlyBudget;
+  String name;
+  double monthlyBudget;
 
   CategoryStructureModel({
     int ? id,

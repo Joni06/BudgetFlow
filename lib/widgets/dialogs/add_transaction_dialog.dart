@@ -3,24 +3,17 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../logic/budget_provider.dart';
+import '../../logic/settings_provider.dart';
 import '../../models/category_structure_model.dart';
 import '../../models/transaction_model.dart';
 import '../../theme/app_theme.dart';
 
-void showAddTransactionDialog(
-  BuildContext context,
-  List<CategoryStructureModel> categories,
-) {
-  showDialog(
-    context: context,
-    builder: (_) => AddTransactionDialog(categories: categories),
-  );
+void showAddTransactionDialog(BuildContext context) {
+  showDialog(context: context, builder: (_) => AddTransactionDialog());
 }
 
 class AddTransactionDialog extends StatefulWidget {
-  final List<CategoryStructureModel> categories;
-
-  const AddTransactionDialog({super.key, required this.categories});
+  const AddTransactionDialog({super.key});
 
   @override
   State<AddTransactionDialog> createState() => _AddTransactionDialogState();
@@ -44,6 +37,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final settingsProv = context.watch<SettingsProvider>();
+    final categories = settingsProv.settings?.categories ?? [];
     return AlertDialog(
       backgroundColor: AppTheme.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -70,7 +65,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             _buildTextField(noteController, 'Enter note'),
             const SizedBox(height: 12),
 
-            _buildDropdown(),
+            _buildDropdown(categories: categories),
             const SizedBox(height: 12),
 
             _buildDateField(dateController),
@@ -133,7 +128,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     );
   }
 
-  Widget _buildDropdown() {
+  Widget _buildDropdown({required List<CategoryStructureModel> categories}) {
     return DropdownButtonFormField<CategoryStructureModel>(
       initialValue: selectedCategory,
       borderRadius: BorderRadius.circular(12),
@@ -149,7 +144,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 15),
       ),
-      items: widget.categories.map((category) {
+      items: categories.map((category) {
         return DropdownMenuItem(value: category, child: Text(category.name));
       }).toList(),
       onChanged: (value) => setState(() {
@@ -195,8 +190,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
         color: AppTheme.surfaceVariant,
         borderRadius: BorderRadius.circular(12),
       ),
-      //padding: const EdgeInsets.symmetric(vertical: 3),
-      padding: const EdgeInsets.fromLTRB(16, 3, 8, 3),
+      padding: const EdgeInsets.fromLTRB(16, 3, 6, 3),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

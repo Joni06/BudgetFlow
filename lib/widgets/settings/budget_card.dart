@@ -8,12 +8,15 @@ class BudgetCard extends StatelessWidget {
   final Color? color;
   final bool shadow;
 
+  final Function(String newTitle, double newBudget) onUpdate;
+
   const BudgetCard({
     super.key,
     required this.title,
     required this.budget,
     this.color,
     this.shadow = true,
+    required this.onUpdate,
   });
 
   void _showEditDialog(BuildContext context) {
@@ -46,6 +49,7 @@ class BudgetCard extends StatelessWidget {
               ),
               SizedBox(height: 12),
               TextField(
+                controller: budgetController,
                 style: TextStyle(color: AppTheme.textPrimary),
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(
@@ -77,6 +81,8 @@ class BudgetCard extends StatelessWidget {
                 final newTitle = titleController.text;
                 final newBudget =
                     double.tryParse(budgetController.text) ?? budget;
+
+                onUpdate(newTitle, newBudget);
 
                 Navigator.pop(context);
               },
