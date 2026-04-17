@@ -74,7 +74,6 @@ class BudgetProvider extends ChangeNotifier {
     }
 
     final yearObj = _years[yearIndex];
-
     var monthObj = yearObj.months[mKey];
 
     if (monthObj == null) {
@@ -82,24 +81,55 @@ class BudgetProvider extends ChangeNotifier {
       yearObj.months[mKey] = monthObj;
     }
 
-    final catIndex = monthObj.categories.indexWhere(
-      (c) => c.id == tx.categoryId,
-    );
+    int catIndex = monthObj.categories.indexWhere((c) => c.id == tx.categoryId);
+
+    CategoryModel? targetCategory;
 
     if (catIndex != -1) {
-      final oldCategory = monthObj.categories[catIndex];
-      final newTransactions = [...oldCategory.transactions, tx];
-
-      final newCatSpent = newTransactions.fold(0.0, (sum, t) => sum + t.amount);
-
-      monthObj.categories[catIndex] = oldCategory.copyWith(
-        transactions: newTransactions,
-        spent: newCatSpent,
+      targetCategory = monthObj.categories[catIndex];
+    } else {
+      final template = _settingsProvider?.settings?.categories.firstWhere(
+            (c) => c.id == tx.categoryId,
       );
-      final newMonthSpent = monthObj.categories.fold(0.0, (sum, c) => sum + c.spent);
-      yearObj.months[mKey] = monthObj.copyWith(spent: newMonthSpent);
 
+      if (template != null) {
+        targetCategory = CategoryModel(
+          id: template.id,
+          name: template.name,
+          monthlyBudget: template.monthlyBudget,
+          spent: 0.0,
+          transactions: [],
+        );
+        monthObj.categories.add(targetCategory);
+        catIndex = monthObj.categories.length - 1;
+      }
     }
+
+    if (targetCategory == null) return;
+
+    final newTransactions = [...targetCategory.transactions, tx];
+    final newCatSpent = newTransactions.fold(0.0, (sum, t) => sum + t.amount);
+
+    monthObj.categories[catIndex] = targetCategory.copyWith(
+      transactions: newTransactions,
+      spent: newCatSpent,
+    );
+
+    final newMonthSpent = monthObj.categories.fold(
+      0.0,
+          (sum, c) => sum + c.spent,
+    );
+
+    final newMonthBudget = monthObj.categories.fold(
+      0.0,
+          (sum, c) => sum + c.monthlyBudget,
+    );
+
+    yearObj.months[mKey] = monthObj.copyWith(
+      spent: newMonthSpent,
+      budget: newMonthBudget,
+    );
+
     notifyListeners();
     saveData();
   }
@@ -132,10 +162,10 @@ class BudgetProvider extends ChangeNotifier {
     return File('${directory.path}/budget_data.json');
   }
 
-  void showYear() {
+  /*void showYear() {
     final yearNum = DateTime.now().year;
     int yearIndex = _years.indexWhere((y) => y.year == yearNum);
     final yearObj = _years[yearIndex];
     print(yearObj.toString());
-  }
+  }*/
 }
