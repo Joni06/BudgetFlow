@@ -39,7 +39,7 @@ class TransactionModel {
       'amount': amount,
       'note': note,
       'categoryId': categoryId,
-      'date': date,
+      'date': date.toIso8601String(),
       'repeatMonthly': repeatMonthly
     };
   }
@@ -52,5 +52,10 @@ class TransactionModel {
       date: DateTime.parse(json['date']),
       repeatMonthly: json['repeatMonthly'],
     );
+  }
+
+  @override
+  String toString() {
+    return 'TransactionModel(id: $id, amount: $amount, note: $note, categoryId: $categoryId, date: $date, repeatMonthly: $repeatMonthly)';
   }
 }

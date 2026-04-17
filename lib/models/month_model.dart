@@ -62,4 +62,9 @@ class MonthModel {
           .toList(),
     );
   }
+
+  @override
+  String toString() {
+    return 'MonthModel(month: $month, budget: $budget, income: $income, spent: $spent, categories: ${categories.toString()})';
+  }
 }

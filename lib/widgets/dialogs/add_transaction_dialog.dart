@@ -254,6 +254,11 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       listen: false,
     ).addTransaction(newTransaction);
 
+    Provider.of<BudgetProvider>(
+      context,
+      listen: false,
+    ).showYear();
+
     Navigator.pop(context);
   }
 }

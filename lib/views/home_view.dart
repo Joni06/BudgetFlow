@@ -1,12 +1,13 @@
 import 'package:buget_flow/theme/app_theme.dart';
 import 'package:buget_flow/views/settings/settings_view.dart';
-import 'package:buget_flow/widgets/settings/budget_card.dart';
+import 'package:buget_flow/views/year_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../logic/budget_provider.dart';
 import '../logic/settings_provider.dart';
 import '../widgets/dialogs/add_transaction_dialog.dart';
+import '../widgets/year_card.dart';
 
 class HomeView extends StatelessWidget {
   final String title;
@@ -43,24 +44,26 @@ class HomeView extends StatelessWidget {
           ),
         ],
       ),
-      body: years.isNotEmpty
+      body: years.isEmpty
           ? const Center(child: Text('No data available'))
           : ListView.builder(
               itemCount: years.length,
               itemBuilder: (context, index) {
-                final year = years[index];
 
-                double yearlySpend = 0;
+                final yearObj = years[index];
+                final totalYearlySpent = yearObj.months.values.fold(0.0, (sum, m) => sum + m.spent);
 
-                year.months.forEach((month, monthObj) {
-                  yearlySpend += monthObj.spent;
-                });
-
-                return BudgetCard(
-                  title: year.year.toString(),
-                  budget: yearlySpend,
-                  onUpdate: (String newTitle, double newBudget) {},
-                );
+                return YearCard(
+                  year: yearObj.year,
+                  spent: totalYearlySpent,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => YearView(yearData: yearObj),
+                      ),
+                    );
+                  },                );
               },
             ),
       floatingActionButton: FloatingActionButton(

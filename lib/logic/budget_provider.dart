@@ -15,6 +15,7 @@ class BudgetProvider extends ChangeNotifier {
   SettingsProvider? _settingsProvider;
 
   List<YearModel> get years => _years;
+
   bool get isLoading => _isLoading;
 
   BudgetProvider() {
@@ -81,17 +82,23 @@ class BudgetProvider extends ChangeNotifier {
       yearObj.months[mKey] = monthObj;
     }
 
-    final catIndex = monthObj.categories.indexWhere((c) => c.id == tx.categoryId);
+    final catIndex = monthObj.categories.indexWhere(
+      (c) => c.id == tx.categoryId,
+    );
 
     if (catIndex != -1) {
       final oldCategory = monthObj.categories[catIndex];
       final newTransactions = [...oldCategory.transactions, tx];
-      final newSpent = newTransactions.fold(0.0, (sum, t) => sum + t.amount);
+
+      final newCatSpent = newTransactions.fold(0.0, (sum, t) => sum + t.amount);
 
       monthObj.categories[catIndex] = oldCategory.copyWith(
         transactions: newTransactions,
-        spent: newSpent,
+        spent: newCatSpent,
       );
+      final newMonthSpent = monthObj.categories.fold(0.0, (sum, c) => sum + c.spent);
+      yearObj.months[mKey] = monthObj.copyWith(spent: newMonthSpent);
+
     }
     notifyListeners();
     saveData();
@@ -123,5 +130,12 @@ class BudgetProvider extends ChangeNotifier {
   Future<File> _getFormattedFile() async {
     final directory = await getApplicationDocumentsDirectory();
     return File('${directory.path}/budget_data.json');
+  }
+
+  void showYear() {
+    final yearNum = DateTime.now().year;
+    int yearIndex = _years.indexWhere((y) => y.year == yearNum);
+    final yearObj = _years[yearIndex];
+    print(yearObj.toString());
   }
 }

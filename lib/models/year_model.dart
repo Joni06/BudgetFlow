@@ -43,4 +43,9 @@ class YearModel {
       ),
     );
   }
+
+  @override
+  String toString() {
+    return 'YearModel(year: $year, months: ${months.toString()})';
+  }
 }

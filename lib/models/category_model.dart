@@ -52,4 +52,9 @@ class CategoryModel {
           .toList(),
     );
   }
+
+  @override
+  String toString() {
+    return 'CategoryModel(id: $id, name: $name, monthlyBudget: $monthlyBudget, spent: $spent, transactions: ${transactions.toString()})';
+  }
 }
