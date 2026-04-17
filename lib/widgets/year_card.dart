@@ -19,40 +19,45 @@ class YearCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.fromLTRB(10, 8, 10, 0),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         decoration: BoxDecoration(
           color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Row(
           children: [
-            CircleAvatar(
-              backgroundColor: AppTheme.primary.withValues(),
-              child: Icon(Icons.calendar_today, color: AppTheme.primary),
-            ),
-            const SizedBox(width: 16),
+            Icon(Icons.calendar_today, color: AppTheme.primary, size: 20),
+            const SizedBox(width: 10),
+
             Text(
               year.toString(),
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const Spacer(),
-            Text(
-              '${spent.toStringAsFixed(2)} €',
               style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Colors.redAccent,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppTheme.textSecondary),
+
+            const Spacer(),
+
+            Text(
+              '${spent.toStringAsFixed(2)} €',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.textSecondary,
+              ),
+            ),
+
+            const SizedBox(width: 4),
+            Icon(Icons.chevron_right, color: AppTheme.textSecondary, size: 20),
           ],
         ),
       ),

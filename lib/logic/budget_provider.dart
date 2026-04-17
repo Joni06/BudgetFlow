@@ -119,7 +119,6 @@ class BudgetProvider extends ChangeNotifier {
       0.0,
           (sum, c) => sum + c.spent,
     );
-
     final newMonthBudget = monthObj.categories.fold(
       0.0,
           (sum, c) => sum + c.monthlyBudget,
@@ -160,6 +159,25 @@ class BudgetProvider extends ChangeNotifier {
   Future<File> _getFormattedFile() async {
     final directory = await getApplicationDocumentsDirectory();
     return File('${directory.path}/budget_data.json');
+  }
+
+  YearModel getYear(int yearNumber) {
+    return _years.firstWhere(
+          (y) => y.year == yearNumber,
+      orElse: () => YearModel(year: yearNumber, months: {}),
+    );
+  }
+
+  MonthModel getMonth(int yearNumber, int monthNumber) {
+    final year = getYear(yearNumber);
+    return year.months[monthNumber] ?? MonthModel.empty(monthNumber);
+  }
+
+  CategoryModel getCategory(int yearNumber, int monthNumber, int categoryId) {
+    final month = getMonth(yearNumber, monthNumber);
+    return month.categories.firstWhere(
+          (c) => c.id == categoryId,
+    );
   }
 
   /*void showYear() {

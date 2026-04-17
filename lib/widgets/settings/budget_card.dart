@@ -120,14 +120,14 @@ class BudgetCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 '${budget.toStringAsFixed(2)} €',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(width: 4),
               IconButton(

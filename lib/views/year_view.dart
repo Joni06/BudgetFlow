@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart'; // WICHTIG
+import 'package:provider/provider.dart';
 import '../../logic/budget_provider.dart';
-import '../../models/year_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/month_card.dart';
+import '../utils/date_formatter.dart';
+import 'month_view.dart';
 
 class YearView extends StatelessWidget {
   final int yearNumber;
@@ -14,10 +15,7 @@ class YearView extends StatelessWidget {
   Widget build(BuildContext context) {
     final budgetProvider = context.watch<BudgetProvider>();
 
-    final yearData = budgetProvider.years.firstWhere(
-          (y) => y.year == yearNumber,
-      orElse: () => YearModel(year: yearNumber, months: {}),
-    );
+    final yearData = budgetProvider.getYear(yearNumber);
 
     final sortedMonthKeys = yearData.months.keys.toList()..sort();
 
@@ -36,23 +34,21 @@ class YearView extends StatelessWidget {
           final month = yearData.months[monthKey]!;
 
           return MonthCard(
-            monthName: _getMonthName(monthKey),
+            monthName: DateUtilsHelper.getMonthName(monthKey),
             spent: month.spent,
             budget: month.budget,
             onTap: () {
-              //TODO
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      MonthView(yearNumber: yearNumber, monthNumber: monthKey),
+                ),
+              );
             },
           );
         },
       ),
     );
-  }
-
-  String _getMonthName(int month) {
-    const monthNames = [
-      'January', 'February', 'March', 'April', 'Mai', 'June',
-      'Juli', 'August', 'September', 'October', 'November', 'December'
-    ];
-    return (month >= 1 && month <= 12) ? monthNames[month - 1] : 'Unknown';
   }
 }

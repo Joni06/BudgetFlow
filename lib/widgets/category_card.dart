@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 
-class MonthCard extends StatelessWidget {
-  final String monthName;
+class CategoryCard extends StatelessWidget {
+  final String categoryName;
   final double spent;
   final double budget;
   final VoidCallback onTap;
 
-  const MonthCard({
+  const CategoryCard({
     super.key,
-    required this.monthName,
+    required this.categoryName,
     required this.spent,
     required this.budget,
     required this.onTap,
@@ -24,7 +24,7 @@ class MonthCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 0),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
           color: AppTheme.surface,
           borderRadius: BorderRadius.circular(12),
@@ -39,15 +39,15 @@ class MonthCard extends StatelessWidget {
         child: Column(
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  monthName,
+                  categoryName,
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                const Spacer(),
                 Text(
                   '${spent.toStringAsFixed(2)} €',
                   style: TextStyle(
@@ -60,9 +60,7 @@ class MonthCard extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 8),
-
             ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child: LinearProgressIndicator(
