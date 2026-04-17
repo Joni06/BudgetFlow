@@ -20,7 +20,7 @@ class AddTransactionDialog extends StatefulWidget {
 }
 
 class _AddTransactionDialogState extends State<AddTransactionDialog> {
-  final amountController = TextEditingController(text: '-');
+  final amountController = TextEditingController();
   final noteController = TextEditingController();
   final dateController = TextEditingController();
   CategoryStructureModel? selectedCategory;
@@ -108,11 +108,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       controller: controller,
       style: TextStyle(color: AppTheme.textPrimary),
       inputFormatters: numberOnly
-          ? [
-              FilteringTextInputFormatter.allow(
-                RegExp(r'^[+-]?\d*[,.]?\d{0,2}'),
-              ),
-            ]
+          ? [FilteringTextInputFormatter.allow(RegExp(r'^[-]?\d*[,.]?\d{0,2}'))]
           : null,
       decoration: InputDecoration(
         hintText: hint,
@@ -254,10 +250,12 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       listen: false,
     ).addTransaction(newTransaction);
 
+    /*
+    only for testing
     Provider.of<BudgetProvider>(
       context,
       listen: false,
-    ).showYear();
+    ).showYear();*/
 
     Navigator.pop(context);
   }

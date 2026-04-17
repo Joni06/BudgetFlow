@@ -49,9 +49,11 @@ class HomeView extends StatelessWidget {
           : ListView.builder(
               itemCount: years.length,
               itemBuilder: (context, index) {
-
                 final yearObj = years[index];
-                final totalYearlySpent = yearObj.months.values.fold(0.0, (sum, m) => sum + m.spent);
+                final totalYearlySpent = yearObj.months.values.fold(
+                  0.0,
+                  (sum, m) => sum + m.spent,
+                );
 
                 return YearCard(
                   year: yearObj.year,
@@ -60,10 +62,12 @@ class HomeView extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => YearView(yearData: yearObj),
+                        builder: (context) =>
+                            YearView(yearNumber: yearObj.year),
                       ),
                     );
-                  },                );
+                  },
+                );
               },
             ),
       floatingActionButton: FloatingActionButton(

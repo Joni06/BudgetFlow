@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // WICHTIG
+import '../../logic/budget_provider.dart';
 import '../../models/year_model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/month_card.dart';
 
 class YearView extends StatelessWidget {
-  final YearModel yearData;
+  final int yearNumber;
 
-  const YearView({super.key, required this.yearData});
+  const YearView({super.key, required this.yearNumber});
 
   @override
   Widget build(BuildContext context) {
+    final budgetProvider = context.watch<BudgetProvider>();
+
+    final yearData = budgetProvider.years.firstWhere(
+          (y) => y.year == yearNumber,
+      orElse: () => YearModel(year: yearNumber, months: {}),
+    );
+
     final sortedMonthKeys = yearData.months.keys.toList()..sort();
 
     return Scaffold(
