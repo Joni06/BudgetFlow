@@ -1,4 +1,4 @@
-import 'package:buget_flow/models/transaction_model.dart';
+import 'package:budget_flow/models/transaction_model.dart';
 
 class CategoryModel {
   final int id;

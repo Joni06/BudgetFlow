@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+
 import '../../logic/settings_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/settings/budget_card.dart';

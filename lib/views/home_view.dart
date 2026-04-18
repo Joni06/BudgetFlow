@@ -1,6 +1,6 @@
-import 'package:buget_flow/theme/app_theme.dart';
-import 'package:buget_flow/views/settings/settings_view.dart';
-import 'package:buget_flow/views/year_view.dart';
+import 'package:budget_flow/theme/app_theme.dart';
+import 'package:budget_flow/views/settings/settings_view.dart';
+import 'package:budget_flow/views/year_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

@@ -1,9 +1,10 @@
-import 'package:buget_flow/models/category_model.dart';
-import 'package:buget_flow/models/month_model.dart';
-import 'package:buget_flow/views/category_view.dart';
-import 'package:buget_flow/widgets/category_card.dart';
+import 'package:budget_flow/models/category_model.dart';
+import 'package:budget_flow/models/month_model.dart';
+import 'package:budget_flow/views/category_view.dart';
+import 'package:budget_flow/widgets/category_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../logic/budget_provider.dart';
 import '../../theme/app_theme.dart';
 import '../utils/date_formatter.dart';

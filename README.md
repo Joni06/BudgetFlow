@@ -1,4 +1,4 @@
-# buget_flow
+# budget_flow
 
 A new Flutter project.
 

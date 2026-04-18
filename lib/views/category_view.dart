@@ -1,7 +1,8 @@
-import 'package:buget_flow/models/category_model.dart';
-import 'package:buget_flow/models/transaction_model.dart';
+import '../models/category_model.dart';
+import '../models/transaction_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../logic/budget_provider.dart';
 import '../../theme/app_theme.dart';
 import '../utils/date_formatter.dart';
@@ -11,7 +12,6 @@ class CategoryView extends StatelessWidget {
   final int categoryId;
   final int monthNumber;
   final int yearNumber;
-
 
   const CategoryView({
     super.key,
@@ -24,7 +24,11 @@ class CategoryView extends StatelessWidget {
   Widget build(BuildContext context) {
     final budgetProvider = context.watch<BudgetProvider>();
 
-  final CategoryModel categoryData = budgetProvider.getCategory(yearNumber, monthNumber, categoryId);
+    final CategoryModel categoryData = budgetProvider.getCategory(
+      yearNumber,
+      monthNumber,
+      categoryId,
+    );
 
     final transactions = List<TransactionModel>.from(categoryData.transactions)
       ..sort((a, b) => a.date.compareTo(b.date));

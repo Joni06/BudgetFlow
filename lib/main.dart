@@ -1,10 +1,10 @@
-import 'package:buget_flow/theme/app_theme.dart';
-import 'package:buget_flow/views/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'logic/budget_provider.dart';
 import 'logic/settings_provider.dart';
+import 'theme/app_theme.dart';
+import 'views/home_view.dart';
 
 void main() {
   runApp(
@@ -14,7 +14,7 @@ void main() {
         ChangeNotifierProxyProvider<SettingsProvider, BudgetProvider>(
           create: (_) => BudgetProvider(),
           update: (context, settingsProv, budgetProv) =>
-          budgetProv!..updateSettings(settingsProv),
+              budgetProv!..updateSettings(settingsProv),
         ),
       ],
       child: const MyApp(),

@@ -1,4 +1,4 @@
-import 'package:buget_flow/theme/app_theme.dart';
+import 'package:budget_flow/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class TitleCard extends StatelessWidget {
