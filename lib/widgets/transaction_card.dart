@@ -21,6 +21,7 @@ class TransactionCard extends StatelessWidget {
     final isNegative = amount < 0;
 
     return Container(
+      height: 66,
       margin: const EdgeInsets.fromLTRB(10, 8, 10, 0),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10), //TOdo bnei allen card die hight gleich machen
       decoration: BoxDecoration(

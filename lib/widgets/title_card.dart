@@ -9,6 +9,7 @@ class TitleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 66,
       margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

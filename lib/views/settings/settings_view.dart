@@ -45,7 +45,7 @@ class SettingsView extends StatelessWidget {
                 context,
               ).copyWith(dividerColor: Colors.transparent),
               child: ExpansionTile(
-                tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+                tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 title: Text(
                   "Categories",
                   style: TextStyle(
@@ -77,7 +77,6 @@ class SettingsView extends StatelessWidget {
                     child: GestureDetector(
                       onTap: () => _showAddCategoryDialog(context),
                       child: Container(
-                        //padding: const EdgeInsets.all(14),
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
                           color: AppTheme.surfaceVariant,

@@ -47,6 +47,7 @@ class HomeView extends StatelessWidget {
       body: years.isEmpty
           ? const Center(child: Text('No data available'))
           : ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: 10),
               itemCount: years.length,
               itemBuilder: (context, index) {
                 final yearObj = years[index];
