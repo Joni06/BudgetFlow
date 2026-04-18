@@ -110,7 +110,7 @@ class BudgetCard extends StatelessWidget {
         boxShadow: [
           if (shadow)
             BoxShadow(
-              color: Colors.black.withValues(),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
