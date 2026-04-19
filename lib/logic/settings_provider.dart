@@ -82,8 +82,8 @@ class SettingsProvider extends ChangeNotifier {
     if (currentSettings == null) return;
     currentSettings.monthlyIncome = newIncome;
 
-    saveSettings();
     notifyListeners();
+    saveSettings();
   }
 
   Future<File> _getFile() async {

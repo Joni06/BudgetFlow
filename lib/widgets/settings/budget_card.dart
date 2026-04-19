@@ -7,6 +7,7 @@ class BudgetCard extends StatelessWidget {
   final double budget;
   final Color? color;
   final bool shadow;
+  final bool monthlyIncome;
 
   final Function(String newTitle, double newBudget) onUpdate;
 
@@ -16,6 +17,7 @@ class BudgetCard extends StatelessWidget {
     required this.budget,
     this.color,
     this.shadow = true,
+    this.monthlyIncome = true,
     required this.onUpdate,
   });
 
@@ -34,20 +36,22 @@ class BudgetCard extends StatelessWidget {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
-                controller: titleController,
-                decoration: InputDecoration(
-                  hintText: 'New Title',
-                  hintStyle: TextStyle(color: AppTheme.textSecondary),
-                  filled: true,
-                  fillColor: AppTheme.surfaceVariant,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+              if (monthlyIncome) ...[
+                TextField(
+                  controller: titleController,
+                  decoration: InputDecoration(
+                    hintText: 'New Title',
+                    hintStyle: TextStyle(color: AppTheme.textSecondary),
+                    filled: true,
+                    fillColor: AppTheme.surfaceVariant,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 12),
+                SizedBox(height: 12),
+              ],
               TextField(
                 controller: budgetController,
                 style: TextStyle(color: AppTheme.textPrimary),
@@ -77,7 +81,6 @@ class BudgetCard extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                //TODO
                 final newTitle = titleController.text;
                 final newBudget =
                     double.tryParse(budgetController.text) ?? budget;
@@ -102,8 +105,8 @@ class BudgetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 66,
-      margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+      margin: const EdgeInsets.fromLTRB(10, 8, 10, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: color ?? AppTheme.surface,
         borderRadius: BorderRadius.circular(12),

@@ -52,7 +52,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       ),
       content: SingleChildScrollView(
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             _buildTextField(
               amountController,
@@ -228,10 +227,17 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     final category = selectedCategory;
     final date = selectedDate;
 
-    if (amount == null || category == null) {
+    if (category == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter an amount and select a category'),
+          content: Text('Please select a category'),
+        ),
+      );
+      return;
+    } else if (amount == null){
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter an amount'),
         ),
       );
       return;
@@ -249,13 +255,6 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       context,
       listen: false,
     ).addTransaction(newTransaction);
-
-    /*
-    only for testing
-    Provider.of<BudgetProvider>(
-      context,
-      listen: false,
-    ).showYear();*/
 
     Navigator.pop(context);
   }

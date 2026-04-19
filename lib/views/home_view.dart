@@ -1,4 +1,5 @@
 import 'package:budget_flow/theme/app_theme.dart';
+import 'package:budget_flow/views/settings/settings_view.dart';
 import 'package:budget_flow/views/year_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +32,7 @@ class _HomeViewState extends State<HomeView> {
 
     final List<Widget> pages = [
       _buildHomeContent(budgetProv),
-      const Center(child: Text('Lates')),
+      const Center(child: Text('Latest')),
     ];
 
     return Scaffold(
@@ -39,6 +40,19 @@ class _HomeViewState extends State<HomeView> {
         backgroundColor: AppTheme.primary,
         title: Text(widget.title),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SettingsView(title: 'Settings'),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: pages[_selectedIndex],
 
@@ -69,7 +83,7 @@ class _HomeViewState extends State<HomeView> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showAddTransactionDialog(context),
-        backgroundColor: AppTheme.primaryContainer,
+        backgroundColor: AppTheme.primary,
         child: const Icon(Icons.add, color: AppTheme.textPrimary),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,

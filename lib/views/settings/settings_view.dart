@@ -22,13 +22,22 @@ class SettingsView extends StatelessWidget {
         backgroundColor: AppTheme.primary,
         title: Text(title),
         centerTitle: true,
-        elevation: 0,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(10),
         children: [
+          SizedBox(height: 10),
+          BudgetCard(
+            title: "Monthly Income",
+            budget: settingsProv.settings?.monthlyIncome ?? 0.0,
+            color: AppTheme.surface,
+            monthlyIncome: false,
+            shadow: true,
+            onUpdate: (newTitle, newIncome) {
+              context.read<SettingsProvider>().updateIncome(newIncome);
+            },
+          ),
           Container(
-            margin: const EdgeInsets.only(top: 10),
+            margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
             decoration: BoxDecoration(
               color: AppTheme.surface,
               borderRadius: BorderRadius.circular(12),

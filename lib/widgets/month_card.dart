@@ -26,7 +26,7 @@ class MonthCard extends StatelessWidget {
       child: Container(
         height: 66,
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 0),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
           color: AppTheme.surface,
           borderRadius: BorderRadius.circular(12),

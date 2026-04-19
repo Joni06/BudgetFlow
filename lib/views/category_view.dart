@@ -51,6 +51,17 @@ class CategoryView extends StatelessWidget {
             note: transaction.note,
             date: transaction.date,
             repeatMonthly: transaction.repeatMonthly,
+            onUpdate: (newAmount, newNote, newRepeatMonthly) {
+              context.read<BudgetProvider>().updateTransaction(
+                year: yearNumber,
+                month: monthNumber,
+                categoryId: categoryId,
+                transactionId: transaction.id,
+                newAmount: newAmount,
+                newNote: newNote,
+                newRepeatMonthly: newRepeatMonthly,
+              );
+            },
           );
         },
       ),

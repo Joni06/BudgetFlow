@@ -90,7 +90,7 @@ class BudgetProvider extends ChangeNotifier {
       targetCategory = monthObj.categories[catIndex];
     } else {
       final template = _settingsProvider?.settings?.categories.firstWhere(
-            (c) => c.id == tx.categoryId,
+        (c) => c.id == tx.categoryId,
       );
 
       if (template != null) {
@@ -118,11 +118,11 @@ class BudgetProvider extends ChangeNotifier {
 
     final newMonthSpent = monthObj.categories.fold(
       0.0,
-          (sum, c) => sum + c.spent,
+      (sum, c) => sum + c.spent,
     );
     final newMonthBudget = monthObj.categories.fold(
       0.0,
-          (sum, c) => sum + c.monthlyBudget,
+      (sum, c) => sum + c.monthlyBudget,
     );
 
     yearObj.months[mKey] = monthObj.copyWith(
@@ -130,6 +130,54 @@ class BudgetProvider extends ChangeNotifier {
       budget: newMonthBudget,
     );
 
+    notifyListeners();
+    saveData();
+  }
+
+  void updateTransaction({
+    required int year,
+    required int month,
+    required int categoryId,
+    required int transactionId,
+    required double newAmount,
+    required String newNote,
+    required bool newRepeatMonthly,
+  }) {
+    int yearIndex = _years.indexWhere((y) => y.year == year);
+    if (yearIndex == -1) return;
+    final yearObj = _years[yearIndex];
+    var monthObj = yearObj.months[month];
+    if (monthObj == null) return;
+
+    int catIndex = monthObj.categories.indexWhere((c) => c.id == categoryId);
+    if (catIndex == -1) return;
+    final category = monthObj.categories[catIndex];
+    int txIndex = category.transactions.indexWhere(
+      (t) => t.id == transactionId,
+    );
+    if (txIndex == -1) return;
+    final updatedTransactions = List<TransactionModel>.from(
+      category.transactions,
+    );
+
+    updatedTransactions[txIndex] = updatedTransactions[txIndex].copyWith(
+      amount: newAmount,
+      note: newNote,
+      repeatMonthly: newRepeatMonthly,
+    );
+    final newCatSpent = updatedTransactions.fold(
+      0.0,
+      (sum, t) => sum + t.amount,
+    );
+    monthObj.categories[catIndex] = category.copyWith(
+      transactions: updatedTransactions,
+      spent: newCatSpent,
+    );
+    final newMonthSpent = monthObj.categories.fold(
+      0.0,
+      (sum, c) => sum + c.spent,
+    );
+    yearObj.months[month] = monthObj.copyWith(spent: newMonthSpent);
     notifyListeners();
     saveData();
   }
@@ -164,7 +212,7 @@ class BudgetProvider extends ChangeNotifier {
 
   YearModel getYear(int yearNumber) {
     return _years.firstWhere(
-          (y) => y.year == yearNumber,
+      (y) => y.year == yearNumber,
       orElse: () => YearModel(year: yearNumber, months: {}),
     );
   }
@@ -176,9 +224,7 @@ class BudgetProvider extends ChangeNotifier {
 
   CategoryModel getCategory(int yearNumber, int monthNumber, int categoryId) {
     final month = getMonth(yearNumber, monthNumber);
-    return month.categories.firstWhere(
-          (c) => c.id == categoryId,
-    );
+    return month.categories.firstWhere((c) => c.id == categoryId);
   }
 
   /*void showYear() {
