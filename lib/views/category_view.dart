@@ -61,7 +61,14 @@ class CategoryView extends StatelessWidget {
                 newNote: newNote,
                 newRepeatMonthly: newRepeatMonthly,
               );
-            },
+            }, onDelete: () {
+            context.read<BudgetProvider>().deleteTransaction(
+              year: transaction.date.year,
+              month: transaction.date.month,
+              categoryId: transaction.categoryId,
+              transactionId: transaction.id,
+            );
+          },
           );
         },
       ),

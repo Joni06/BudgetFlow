@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../theme/app_theme.dart';
 
 class MonthCard extends StatelessWidget {
@@ -24,7 +23,7 @@ class MonthCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 66,
+        constraints: const BoxConstraints(minHeight: 66),
         margin: const EdgeInsets.fromLTRB(10, 8, 10, 0),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
@@ -38,43 +37,56 @@ class MonthCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  monthName,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        monthName,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        '${spent.toStringAsFixed(2)} / ${budget.toStringAsFixed(2)}€',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: overBudget ? Colors.red : AppTheme.textSecondary,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                Text(
-                  '${spent.toStringAsFixed(2)} €',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: overBudget
-                        ? Colors.red
-                        : AppTheme.textSecondary,
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      minHeight: 6,
+                      backgroundColor: AppTheme.surfaceVariant,
+                      color: overBudget ? Colors.red : AppTheme.primary,
+                    ),
                   ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 8),
-
-            ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: LinearProgressIndicator(
-                value: progress,
-                minHeight: 6,
-                backgroundColor: AppTheme.surfaceVariant,
-                color: overBudget
-                    ? Colors.red
-                    : AppTheme.primary,
+                ],
               ),
+            ),
+            const SizedBox(width: 12),
+            IconButton(
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              icon: Icon(Icons.edit, size: 20, color: AppTheme.primary),
+              onPressed: () {
+                // Hier Edit-Logik einfügen
+              },
             ),
           ],
         ),

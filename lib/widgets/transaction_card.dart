@@ -11,6 +11,7 @@ class TransactionCard extends StatelessWidget {
 
   final Function(double newAmount, String newNote, bool newRepeatMonthly)
   onUpdate;
+  final VoidCallback onDelete;
 
   const TransactionCard({
     super.key,
@@ -19,6 +20,7 @@ class TransactionCard extends StatelessWidget {
     required this.date,
     required this.repeatMonthly,
     required this.onUpdate,
+    required this.onDelete,
   });
 
   @override
@@ -73,12 +75,21 @@ class TransactionCard extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(width: 10),
           IconButton(
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
             icon: Icon(Icons.edit, size: 20, color: AppTheme.primary),
             onPressed: () {
               _showEditDialog(context);
+            },
+          ),
+          IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+            icon: Icon(Icons.delete, size: 20, color: AppTheme.primary),
+            onPressed: () {
+              _deleteTransaction(context);
             },
           ),
         ],
@@ -206,6 +217,34 @@ class TransactionCard extends StatelessWidget {
               ],
             );
           },
+        );
+      },
+    );
+  }
+
+  void _deleteTransaction(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Delete',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          content: Text("Are you sure you want to delete this transaction?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                onDelete();
+                Navigator.pop(context);
+              },
+              child: Text("OK"),
+            ),
+          ],
         );
       },
     );

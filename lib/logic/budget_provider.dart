@@ -182,6 +182,41 @@ class BudgetProvider extends ChangeNotifier {
     saveData();
   }
 
+  void deleteTransaction({
+    required int year,
+    required int month,
+    required int categoryId,
+    required int transactionId,
+  }) {
+    int yearIndex = _years.indexWhere((y) => y.year == year);
+    if (yearIndex == -1) return;
+
+    final yearObj = _years[yearIndex];
+    var monthObj = yearObj.months[month];
+    if (monthObj == null) return;
+
+    int catIndex = monthObj.categories.indexWhere((c) => c.id == categoryId);
+    if (catIndex == -1) return;
+
+    final category = monthObj.categories[catIndex];
+
+    final updatedTransactions = List<TransactionModel>.from(category.transactions);
+    updatedTransactions.removeWhere((t) => t.id == transactionId);
+
+    final newCatSpent = updatedTransactions.fold(0.0, (sum, t) => sum + t.amount);
+
+    monthObj.categories[catIndex] = category.copyWith(
+      transactions: updatedTransactions,
+      spent: newCatSpent,
+    );
+
+    final newMonthSpent = monthObj.categories.fold(0.0, (sum, c) => sum + c.spent);
+    yearObj.months[month] = monthObj.copyWith(spent: newMonthSpent);
+
+    notifyListeners();
+    saveData();
+  }
+
   MonthModel _generateMonthFromSettings(int monthNumber) {
     final settings = _settingsProvider?.settings;
     if (settings == null) return MonthModel.empty(monthNumber);
