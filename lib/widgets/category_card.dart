@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../theme/app_theme.dart';
 
@@ -7,6 +8,8 @@ class CategoryCard extends StatelessWidget {
   final double spent;
   final double budget;
   final VoidCallback onTap;
+  final Function (double newBudget) onUpdate;
+  final VoidCallback onDelete;
 
   const CategoryCard({
     super.key,
@@ -14,6 +17,8 @@ class CategoryCard extends StatelessWidget {
     required this.spent,
     required this.budget,
     required this.onTap,
+    required this.onUpdate,
+    required this.onDelete,
   });
 
   @override
@@ -56,7 +61,8 @@ class CategoryCard extends StatelessWidget {
                       ),
                       const Spacer(),
                       Text(
-                        '${spent.toStringAsFixed(2)} / ${budget.toStringAsFixed(2)} €',
+                        '${spent.toStringAsFixed(2)} / ${budget.toStringAsFixed(
+                            2)} €',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -86,17 +92,114 @@ class CategoryCard extends StatelessWidget {
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
               icon: Icon(Icons.edit, size: 20, color: AppTheme.primary),
-              onPressed: () {},
+              onPressed: () {
+                _showEditDialog(context);
+              },
             ),
-            const SizedBox(width: 8),
             IconButton(
               visualDensity: VisualDensity.compact,
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
               icon: Icon(Icons.delete, size: 20, color: AppTheme.primary),
-              onPressed: () {},
+              onPressed: () {_showDeleteConfirmation(context);},
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  _showEditDialog(BuildContext context) {
+    final budgetController = TextEditingController(text: budget.toString());
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text(
+                'Edit',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildTextField(
+                      budgetController,
+                      "New budget",
+                      suffix: "€",
+                      numberOnly: true,
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    final newAmount =
+                        double.tryParse(
+                          budgetController.text.replaceFirst(',', '.'),
+                        ) ??
+                            budget;
+                    onUpdate(newAmount);
+                    Navigator.pop(context);
+                  },
+                  child: Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Delete?"),
+        content: const Text("Are you sure you want to delete this category, all data in this category for this month is lost?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          TextButton(
+            onPressed: () {
+              onDelete();
+              Navigator.pop(context);
+            },
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller,
+      String hint, {
+        String? suffix,
+        bool numberOnly = false,
+      }) {
+    return TextField(
+      controller: controller,
+      style: TextStyle(color: AppTheme.textPrimary),
+      inputFormatters: numberOnly
+          ? [FilteringTextInputFormatter.allow(RegExp(r'^[-]?\d*[,.]?\d{0,2}'))]
+          : null,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(color: AppTheme.textSecondary),
+        suffixText: suffix,
+        filled: true,
+        fillColor: AppTheme.surfaceVariant,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
       ),
     );

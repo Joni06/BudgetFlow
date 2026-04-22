@@ -60,6 +60,21 @@ class MonthView extends StatelessWidget {
                 ),
               );
             },
+            onUpdate: (newBudget) {
+              context.read<BudgetProvider>().updateCategory(
+                year: yearNumber,
+                month: monthNumber,
+                categoryId: category.id,
+                newBudget: newBudget,
+              );
+            },
+            onDelete: () {
+              context.read<BudgetProvider>().deleteCategory(
+                year: yearNumber,
+                month: monthNumber,
+                categoryId: category.id,
+              );
+            },
           );
         },
       ),

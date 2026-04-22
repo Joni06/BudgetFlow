@@ -75,8 +75,9 @@ class TransactionCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 8),
           IconButton(
+            visualDensity: VisualDensity.compact,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
             icon: Icon(Icons.edit, size: 20, color: AppTheme.primary),
@@ -85,6 +86,7 @@ class TransactionCard extends StatelessWidget {
             },
           ),
           IconButton(
+            visualDensity: VisualDensity.compact,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
             icon: Icon(Icons.delete, size: 20, color: AppTheme.primary),
@@ -228,7 +230,7 @@ class TransactionCard extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-            'Delete',
+            'Delete?',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           content: Text("Are you sure you want to delete this transaction?"),
