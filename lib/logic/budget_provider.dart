@@ -24,6 +24,11 @@ class BudgetProvider extends ChangeNotifier {
     loadData();
   }
 
+  void updateSettings(SettingsProvider settings) {
+    _settingsProvider = settings;
+    notifyListeners();
+  }
+
   Future<void> loadData() async {
     try {
       final file = await _getFormattedFile();
