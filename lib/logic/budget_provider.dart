@@ -281,6 +281,24 @@ class BudgetProvider extends ChangeNotifier {
     saveData();
   }
 
+  void updateMonthIncome({
+    required int year,
+    required int month,
+    required double newIncome,
+  }) {
+    int yearIndex = _years.indexWhere((y) => y.year == year);
+    if (yearIndex == -1) return;
+
+    final yearObj = _years[yearIndex];
+    var monthObj = yearObj.months[month];
+
+    if (monthObj != null) {
+      yearObj.months[month] = monthObj.copyWith(income: newIncome);
+      notifyListeners();
+      saveData();
+    }
+  }
+
   MonthModel _generateMonthFromSettings(int monthNumber) {
     final settings = _settingsProvider?.settings;
     if (settings == null) return MonthModel.empty(monthNumber);

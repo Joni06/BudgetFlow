@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:budget_flow/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +12,7 @@ class BudgetCard extends StatelessWidget {
   final bool monthlyIncome;
 
   final Function(String newTitle, double newBudget) onUpdate;
+  final VoidCallback? onDelete;
 
   const BudgetCard({
     super.key,
@@ -19,6 +22,7 @@ class BudgetCard extends StatelessWidget {
     this.shadow = true,
     this.monthlyIncome = true,
     required this.onUpdate,
+    this.onDelete,
   });
 
   void _showEditDialog(BuildContext context) {
@@ -72,6 +76,7 @@ class BudgetCard extends StatelessWidget {
                   ),
                 ),
               ),
+              Text('\n\nThis wont apply for this or past months',style: TextStyle(color: Colors.red),),
             ],
           ),
           actions: [
@@ -96,6 +101,38 @@ class BudgetCard extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
+        );
+      },
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Are you sure you want to delete "$title"?'),
+              Text('\n\nThis wont apply for this or past months',style: TextStyle(color: Colors.red),),
+            ]
+          ),
+          backgroundColor: AppTheme.surface,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                onDelete?.call();
+                Navigator.pop(context);
+              },
+              child: const Text('Delete'),
+            ),
+          ],
         );
       },
     );
@@ -135,6 +172,7 @@ class BudgetCard extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               IconButton(
+                visualDensity: VisualDensity.compact,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
                 icon: Icon(Icons.edit, size: 20, color: AppTheme.primary),
@@ -142,6 +180,16 @@ class BudgetCard extends StatelessWidget {
                   _showEditDialog(context);
                 },
               ),
+              if (!shadow)
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  icon: Icon(Icons.delete, size: 20, color: AppTheme.primary),
+                  onPressed: () {
+                    _showDeleteDialog(context);
+                  },
+                ),
             ],
           ),
         ],

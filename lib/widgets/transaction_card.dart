@@ -233,7 +233,11 @@ class TransactionCard extends StatelessWidget {
             'Delete?',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          content: Text("Are you sure you want to delete this transaction?"),
+          content: Text(
+            (note != null && note!.isNotEmpty)
+                ? 'Are you sure you want to delete "$note"?'
+                : 'Are you sure you want to delete this transaction?',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),

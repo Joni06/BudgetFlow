@@ -1,19 +1,102 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../theme/app_theme.dart';
 
 class MonthCard extends StatelessWidget {
   final String monthName;
   final double spent;
   final double budget;
+  final double income;
+
   final VoidCallback onTap;
+  final Function(double newIncome) onUpdate;
 
   const MonthCard({
     super.key,
     required this.monthName,
     required this.spent,
     required this.budget,
+    required this.income,
     required this.onTap,
+    required this.onUpdate,
   });
+
+  Widget _buildTextField(
+      TextEditingController controller,
+      String hint, {
+        String? suffix,
+        bool numberOnly = false,
+      }) {
+    return TextField(
+      controller: controller,
+      style: TextStyle(color: AppTheme.textPrimary),
+      inputFormatters: numberOnly
+          ? [FilteringTextInputFormatter.allow(RegExp(r'^[-]?\d*[,.]?\d{0,2}'))]
+          : null,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(color: AppTheme.textSecondary),
+        suffixText: suffix,
+        filled: true,
+        fillColor: AppTheme.surfaceVariant,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+
+  void _showEditIncomeDialog(BuildContext context) {
+    final incomeController = TextEditingController(text: income.toString());
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text(
+                'Edit',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildTextField(
+                      incomeController,
+                      "New income",
+                      suffix: "€",
+                      numberOnly: true,
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    final newIncome =
+                        double.tryParse(
+                          incomeController.text.replaceFirst(',', '.'),
+                        ) ??
+                            income;
+                    onUpdate(newIncome);
+                    Navigator.pop(context);
+                  },
+                  child: Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +168,7 @@ class MonthCard extends StatelessWidget {
               constraints: const BoxConstraints(),
               icon: Icon(Icons.edit, size: 20, color: AppTheme.primary),
               onPressed: () {
-                // Hier Edit-Logik einfügen
+                _showEditIncomeDialog(context);
               },
             ),
           ],

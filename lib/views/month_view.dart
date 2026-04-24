@@ -35,7 +35,11 @@ class MonthView extends StatelessWidget {
       backgroundColor: AppTheme.background,
       appBar: AppBar(
         backgroundColor: AppTheme.primary,
-        title: Text(DateUtilsHelper.getMonthName(monthNumber)),
+        title: Text(
+          monthData.income > 0
+              ? "${DateUtilsHelper.getMonthName(monthNumber)} | ${(monthData.income - monthData.spent).toStringAsFixed(0)}€ left"
+              : DateUtilsHelper.getMonthName(monthNumber),
+        ),
         centerTitle: true,
       ),
       body: ListView.builder(

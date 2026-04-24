@@ -90,4 +90,14 @@ class SettingsProvider extends ChangeNotifier {
     final directory = await getApplicationDocumentsDirectory();
     return File('${directory.path}/settings.json');
   }
+
+  void removeCategory(CategoryStructureModel cat) {
+    final currentSettings = _settings;
+    if (currentSettings == null) return;
+
+    currentSettings.categories.removeWhere((item) => item == cat);
+
+    notifyListeners();
+    saveSettings();
+  }
 }

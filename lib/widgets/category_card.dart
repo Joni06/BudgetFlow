@@ -165,7 +165,7 @@ class CategoryCard extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Delete?"),
-        content: const Text("Are you sure you want to delete this category, all data in this category for this month is lost?"),
+        content: Text('Are you sure you want to delete "${categoryName}" , all data in this category for this month is lost?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
           TextButton(

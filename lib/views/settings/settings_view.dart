@@ -54,7 +54,10 @@ class SettingsView extends StatelessWidget {
                 context,
               ).copyWith(dividerColor: Colors.transparent),
               child: ExpansionTile(
-                tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                tilePadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 4,
+                ),
                 title: Text(
                   "Categories",
                   style: TextStyle(
@@ -79,8 +82,10 @@ class SettingsView extends StatelessWidget {
                           newBudget,
                         );
                       },
+                      onDelete: () => settingsProv.removeCategory(cat),
                     ),
                   ),
+
                   Padding(
                     padding: const EdgeInsets.all(10),
                     child: GestureDetector(

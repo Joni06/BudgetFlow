@@ -38,6 +38,7 @@ class YearView extends StatelessWidget {
             monthName: DateUtilsHelper.getMonthName(monthKey),
             spent: month.spent,
             budget: month.budget,
+            income: month.income,
             onTap: () {
               Navigator.push(
                 context,
@@ -45,6 +46,13 @@ class YearView extends StatelessWidget {
                   builder: (context) =>
                       MonthView(yearNumber: yearNumber, monthNumber: monthKey),
                 ),
+              );
+            },
+            onUpdate: (newIncome) {
+              context.read<BudgetProvider>().updateMonthIncome(
+                year: yearNumber,
+                month: monthKey,
+                newIncome: newIncome,
               );
             },
           );
