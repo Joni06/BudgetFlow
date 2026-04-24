@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:budget_flow/logic/settings_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:collection/collection.dart'; // Für firstWhereOrNull
 
 import '../models/category_model.dart';
 import '../models/month_model.dart';
@@ -16,19 +17,12 @@ class BudgetProvider extends ChangeNotifier {
   SettingsProvider? _settingsProvider;
 
   List<YearModel> get years => _years;
-
   bool get isLoading => _isLoading;
 
   BudgetProvider() {
     loadData();
   }
 
-  void updateSettings(SettingsProvider settings) {
-    _settingsProvider = settings;
-    notifyListeners();
-  }
-
-  //read json
   Future<void> loadData() async {
     try {
       final file = await _getFormattedFile();
@@ -50,7 +44,6 @@ class BudgetProvider extends ChangeNotifier {
     }
   }
 
-  //write json
   Future<void> saveData() async {
     try {
       final file = await _getFormattedFile();
@@ -63,75 +56,60 @@ class BudgetProvider extends ChangeNotifier {
     }
   }
 
-  void addTransaction(TransactionModel tx) {
-    final int yKey = tx.date.year;
-    final int mKey = tx.date.month;
-
-    int yearIndex = _years.indexWhere((y) => y.year == yKey);
-    if (yearIndex == -1) {
-      _years.add(YearModel(year: yKey, months: {}));
+  YearModel _getOrAddYear(int year) {
+    var yearObj = _years.firstWhereOrNull((y) => y.year == year);
+    if (yearObj == null) {
+      yearObj = YearModel(year: year, months: {});
+      _years.add(yearObj);
       _years.sort((a, b) => a.year.compareTo(b.year));
-      yearIndex = _years.indexWhere((y) => y.year == yKey);
     }
+    return yearObj;
+  }
 
-    final yearObj = _years[yearIndex];
-    var monthObj = yearObj.months[mKey];
+  void _updateMonthData(YearModel yearObj, int monthKey, MonthModel monthObj) {
+    final totalSpent = monthObj.categories.fold(0.0, (sum, c) => sum + c.spent);
+    final totalBudget = monthObj.categories.fold(0.0, (sum, c) => sum + c.monthlyBudget);
 
-    if (monthObj == null) {
-      monthObj = _generateMonthFromSettings(mKey);
-      yearObj.months[mKey] = monthObj;
-    }
-
-    int catIndex = monthObj.categories.indexWhere((c) => c.id == tx.categoryId);
-
-    CategoryModel? targetCategory;
-
-    if (catIndex != -1) {
-      targetCategory = monthObj.categories[catIndex];
-    } else {
-      final template = _settingsProvider?.settings?.categories.firstWhere(
-        (c) => c.id == tx.categoryId,
-      );
-
-      if (template != null) {
-        targetCategory = CategoryModel(
-          id: template.id,
-          name: template.name,
-          monthlyBudget: template.monthlyBudget,
-          spent: 0.0,
-          transactions: [],
-        );
-        monthObj.categories.add(targetCategory);
-        catIndex = monthObj.categories.length - 1;
-      }
-    }
-
-    if (targetCategory == null) return;
-
-    final newTransactions = [...targetCategory.transactions, tx];
-    final newCatSpent = newTransactions.fold(0.0, (sum, t) => sum + t.amount);
-
-    monthObj.categories[catIndex] = targetCategory.copyWith(
-      transactions: newTransactions,
-      spent: newCatSpent,
-    );
-
-    final newMonthSpent = monthObj.categories.fold(
-      0.0,
-      (sum, c) => sum + c.spent,
-    );
-    final newMonthBudget = monthObj.categories.fold(
-      0.0,
-      (sum, c) => sum + c.monthlyBudget,
-    );
-
-    yearObj.months[mKey] = monthObj.copyWith(
-      spent: newMonthSpent,
-      budget: newMonthBudget,
+    yearObj.months[monthKey] = monthObj.copyWith(
+      spent: totalSpent,
+      budget: totalBudget,
     );
 
     notifyListeners();
     saveData();
+  }
+
+  void addTransaction(TransactionModel tx) {
+    final yearObj = _getOrAddYear(tx.date.year);
+    final mKey = tx.date.month;
+    var monthObj = yearObj.months[mKey] ?? _generateMonthFromSettings(mKey);
+
+    int catIndex = monthObj.categories.indexWhere((c) => c.id == tx.categoryId);
+
+    if (catIndex == -1) {
+      final template = _settingsProvider?.settings?.categories
+          .firstWhereOrNull((c) => c.id == tx.categoryId);
+      if (template == null) return;
+
+      monthObj.categories.add(CategoryModel(
+        id: template.id,
+        name: template.name,
+        monthlyBudget: template.monthlyBudget,
+        spent: 0.0,
+        transactions: [],
+      ));
+      catIndex = monthObj.categories.length - 1;
+    }
+
+    final category = monthObj.categories[catIndex];
+    final updatedTxs = [...category.transactions, tx];
+
+    monthObj.categories[catIndex] = category.copyWith(
+      transactions: updatedTxs,
+      spent: updatedTxs.fold(0.0, (sum, t) => sum! + t.amount),
+    );
+
+    _updateMonthData(yearObj, mKey, monthObj);
   }
 
   void updateTransaction({
@@ -143,43 +121,30 @@ class BudgetProvider extends ChangeNotifier {
     required String newNote,
     required bool newRepeatMonthly,
   }) {
-    int yearIndex = _years.indexWhere((y) => y.year == year);
-    if (yearIndex == -1) return;
-    final yearObj = _years[yearIndex];
-    var monthObj = yearObj.months[month];
+    final yearObj = _years.firstWhereOrNull((y) => y.year == year);
+    final monthObj = yearObj?.months[month];
     if (monthObj == null) return;
 
-    int catIndex = monthObj.categories.indexWhere((c) => c.id == categoryId);
+    final catIndex = monthObj.categories.indexWhere((c) => c.id == categoryId);
     if (catIndex == -1) return;
-    final category = monthObj.categories[catIndex];
-    int txIndex = category.transactions.indexWhere(
-      (t) => t.id == transactionId,
-    );
-    if (txIndex == -1) return;
-    final updatedTransactions = List<TransactionModel>.from(
-      category.transactions,
-    );
 
-    updatedTransactions[txIndex] = updatedTransactions[txIndex].copyWith(
+    final category = monthObj.categories[catIndex];
+    final txIndex = category.transactions.indexWhere((t) => t.id == transactionId);
+    if (txIndex == -1) return;
+
+    final updatedTxs = List<TransactionModel>.from(category.transactions);
+    updatedTxs[txIndex] = updatedTxs[txIndex].copyWith(
       amount: newAmount,
       note: newNote,
       repeatMonthly: newRepeatMonthly,
     );
-    final newCatSpent = updatedTransactions.fold(
-      0.0,
-      (sum, t) => sum + t.amount,
-    );
+
     monthObj.categories[catIndex] = category.copyWith(
-      transactions: updatedTransactions,
-      spent: newCatSpent,
+      transactions: updatedTxs,
+      spent: updatedTxs.fold(0.0, (sum, t) => sum! + t.amount),
     );
-    final newMonthSpent = monthObj.categories.fold(
-      0.0,
-      (sum, c) => sum + c.spent,
-    );
-    yearObj.months[month] = monthObj.copyWith(spent: newMonthSpent);
-    notifyListeners();
-    saveData();
+
+    _updateMonthData(yearObj!, month, monthObj);
   }
 
   void deleteTransaction({
@@ -188,33 +153,22 @@ class BudgetProvider extends ChangeNotifier {
     required int categoryId,
     required int transactionId,
   }) {
-    int yearIndex = _years.indexWhere((y) => y.year == year);
-    if (yearIndex == -1) return;
-
-    final yearObj = _years[yearIndex];
-    var monthObj = yearObj.months[month];
+    final yearObj = _years.firstWhereOrNull((y) => y.year == year);
+    final monthObj = yearObj?.months[month];
     if (monthObj == null) return;
 
-    int catIndex = monthObj.categories.indexWhere((c) => c.id == categoryId);
+    final catIndex = monthObj.categories.indexWhere((c) => c.id == categoryId);
     if (catIndex == -1) return;
 
     final category = monthObj.categories[catIndex];
-
-    final updatedTransactions = List<TransactionModel>.from(category.transactions);
-    updatedTransactions.removeWhere((t) => t.id == transactionId);
-
-    final newCatSpent = updatedTransactions.fold(0.0, (sum, t) => sum + t.amount);
+    final updatedTxs = category.transactions.where((t) => t.id != transactionId).toList();
 
     monthObj.categories[catIndex] = category.copyWith(
-      transactions: updatedTransactions,
-      spent: newCatSpent,
+      transactions: updatedTxs,
+      spent: updatedTxs.fold(0.0, (sum, t) => sum! + t.amount),
     );
 
-    final newMonthSpent = monthObj.categories.fold(0.0, (sum, c) => sum + c.spent);
-    yearObj.months[month] = monthObj.copyWith(spent: newMonthSpent);
-
-    notifyListeners();
-    saveData();
+    _updateMonthData(yearObj!, month, monthObj);
   }
 
   void updateCategory({
@@ -223,33 +177,18 @@ class BudgetProvider extends ChangeNotifier {
     required int categoryId,
     required double newBudget,
   }) {
-    int yearIndex = _years.indexWhere((y) => y.year == year);
-    if (yearIndex == -1) return;
-
-    final yearObj = _years[yearIndex];
-    var monthObj = yearObj.months[month];
+    final yearObj = _years.firstWhereOrNull((y) => y.year == year);
+    final monthObj = yearObj?.months[month];
     if (monthObj == null) return;
 
-    int catIndex = monthObj.categories.indexWhere((c) => c.id == categoryId);
+    final catIndex = monthObj.categories.indexWhere((c) => c.id == categoryId);
     if (catIndex == -1) return;
 
-    final category = monthObj.categories[catIndex];
-
-    monthObj.categories[catIndex] = category.copyWith(
+    monthObj.categories[catIndex] = monthObj.categories[catIndex].copyWith(
       monthlyBudget: newBudget,
     );
 
-    final newMonthBudget = monthObj.categories.fold(
-      0.0,
-          (sum, c) => sum + c.monthlyBudget,
-    );
-
-    yearObj.months[month] = monthObj.copyWith(
-      budget: newMonthBudget,
-    );
-
-    notifyListeners();
-    saveData();
+    _updateMonthData(yearObj!, month, monthObj);
   }
 
   void deleteCategory({
@@ -257,28 +196,13 @@ class BudgetProvider extends ChangeNotifier {
     required int month,
     required int categoryId,
   }) {
-    int yearIndex = _years.indexWhere((y) => y.year == year);
-    if (yearIndex == -1) return;
-
-    final yearObj = _years[yearIndex];
-    var monthObj = yearObj.months[month];
+    final yearObj = _years.firstWhereOrNull((y) => y.year == year);
+    final monthObj = yearObj?.months[month];
     if (monthObj == null) return;
 
-    final updatedCategories = monthObj.categories
-        .where((c) => c.id != categoryId)
-        .toList();
+    monthObj.categories.removeWhere((c) => c.id == categoryId);
 
-    final newMonthBudget = updatedCategories.fold(0.0, (sum, c) => sum + c.monthlyBudget);
-    final newMonthSpent = updatedCategories.fold(0.0, (sum, c) => sum + c.spent);
-
-    yearObj.months[month] = monthObj.copyWith(
-      categories: updatedCategories,
-      budget: newMonthBudget,
-      spent: newMonthSpent,
-    );
-
-    notifyListeners();
-    saveData();
+    _updateMonthData(yearObj!, month, monthObj);
   }
 
   void updateMonthIncome({
@@ -286,14 +210,11 @@ class BudgetProvider extends ChangeNotifier {
     required int month,
     required double newIncome,
   }) {
-    int yearIndex = _years.indexWhere((y) => y.year == year);
-    if (yearIndex == -1) return;
-
-    final yearObj = _years[yearIndex];
-    var monthObj = yearObj.months[month];
+    final yearObj = _years.firstWhereOrNull((y) => y.year == year);
+    final monthObj = yearObj?.months[month];
 
     if (monthObj != null) {
-      yearObj.months[month] = monthObj.copyWith(income: newIncome);
+      yearObj?.months[month] = monthObj.copyWith(income: newIncome);
       notifyListeners();
       saveData();
     }
@@ -316,7 +237,7 @@ class BudgetProvider extends ChangeNotifier {
     return MonthModel(
       month: monthNumber,
       income: settings.monthlyIncome,
-      budget: newCategories.fold(0, (sum, c) => sum + c.monthlyBudget),
+      budget: newCategories.fold(0.0, (sum, c) => sum + c.monthlyBudget),
       spent: 0.0,
       categories: newCategories,
     );
@@ -327,27 +248,21 @@ class BudgetProvider extends ChangeNotifier {
     return File('${directory.path}/budget_data.json');
   }
 
+
   YearModel getYear(int yearNumber) {
     return _years.firstWhere(
-      (y) => y.year == yearNumber,
+          (y) => y.year == yearNumber,
       orElse: () => YearModel(year: yearNumber, months: {}),
     );
   }
 
   MonthModel getMonth(int yearNumber, int monthNumber) {
     final year = getYear(yearNumber);
-    return year.months[monthNumber] ?? MonthModel.empty(monthNumber);
+    return year.months[monthNumber] ?? _generateMonthFromSettings(monthNumber);
   }
 
   CategoryModel getCategory(int yearNumber, int monthNumber, int categoryId) {
     final month = getMonth(yearNumber, monthNumber);
     return month.categories.firstWhere((c) => c.id == categoryId);
   }
-
-  /*void showYear() {
-    final yearNum = DateTime.now().year;
-    int yearIndex = _years.indexWhere((y) => y.year == yearNum);
-    final yearObj = _years[yearIndex];
-    print(yearObj.toString());
-  }*/
 }
