@@ -17,6 +17,7 @@ class BudgetProvider extends ChangeNotifier {
   SettingsProvider? _settingsProvider;
 
   List<YearModel> get years => _years;
+
   bool get isLoading => _isLoading;
 
   BudgetProvider() {
@@ -68,7 +69,10 @@ class BudgetProvider extends ChangeNotifier {
 
   void _updateMonthData(YearModel yearObj, int monthKey, MonthModel monthObj) {
     final totalSpent = monthObj.categories.fold(0.0, (sum, c) => sum + c.spent);
-    final totalBudget = monthObj.categories.fold(0.0, (sum, c) => sum + c.monthlyBudget);
+    final totalBudget = monthObj.categories.fold(
+      0.0,
+      (sum, c) => sum + c.monthlyBudget,
+    );
 
     yearObj.months[monthKey] = monthObj.copyWith(
       spent: totalSpent,
@@ -87,17 +91,20 @@ class BudgetProvider extends ChangeNotifier {
     int catIndex = monthObj.categories.indexWhere((c) => c.id == tx.categoryId);
 
     if (catIndex == -1) {
-      final template = _settingsProvider?.settings?.categories
-          .firstWhereOrNull((c) => c.id == tx.categoryId);
+      final template = _settingsProvider?.settings?.categories.firstWhereOrNull(
+        (c) => c.id == tx.categoryId,
+      );
       if (template == null) return;
 
-      monthObj.categories.add(CategoryModel(
-        id: template.id,
-        name: template.name,
-        monthlyBudget: template.monthlyBudget,
-        spent: 0.0,
-        transactions: [],
-      ));
+      monthObj.categories.add(
+        CategoryModel(
+          id: template.id,
+          name: template.name,
+          monthlyBudget: template.monthlyBudget,
+          spent: 0.0,
+          transactions: [],
+        ),
+      );
       catIndex = monthObj.categories.length - 1;
     }
 
@@ -121,15 +128,16 @@ class BudgetProvider extends ChangeNotifier {
     required String newNote,
     required bool newRepeatMonthly,
   }) {
-    final yearObj = _years.firstWhereOrNull((y) => y.year == year);
-    final monthObj = yearObj?.months[month];
-    if (monthObj == null) return;
+    final yearObj = _getOrAddYear(year);
+    var monthObj = yearObj.months[month] ?? _generateMonthFromSettings(month);
 
     final catIndex = monthObj.categories.indexWhere((c) => c.id == categoryId);
     if (catIndex == -1) return;
 
     final category = monthObj.categories[catIndex];
-    final txIndex = category.transactions.indexWhere((t) => t.id == transactionId);
+    final txIndex = category.transactions.indexWhere(
+      (t) => t.id == transactionId,
+    );
     if (txIndex == -1) return;
 
     final updatedTxs = List<TransactionModel>.from(category.transactions);
@@ -144,7 +152,7 @@ class BudgetProvider extends ChangeNotifier {
       spent: updatedTxs.fold(0.0, (sum, t) => sum! + t.amount),
     );
 
-    _updateMonthData(yearObj!, month, monthObj);
+    _updateMonthData(yearObj, month, monthObj);
   }
 
   void deleteTransaction({
@@ -153,22 +161,23 @@ class BudgetProvider extends ChangeNotifier {
     required int categoryId,
     required int transactionId,
   }) {
-    final yearObj = _years.firstWhereOrNull((y) => y.year == year);
-    final monthObj = yearObj?.months[month];
-    if (monthObj == null) return;
+    final yearObj = _getOrAddYear(year);
+    var monthObj = yearObj.months[month] ?? _generateMonthFromSettings(month);
 
     final catIndex = monthObj.categories.indexWhere((c) => c.id == categoryId);
     if (catIndex == -1) return;
 
     final category = monthObj.categories[catIndex];
-    final updatedTxs = category.transactions.where((t) => t.id != transactionId).toList();
+    final updatedTxs = category.transactions
+        .where((t) => t.id != transactionId)
+        .toList();
 
     monthObj.categories[catIndex] = category.copyWith(
       transactions: updatedTxs,
       spent: updatedTxs.fold(0.0, (sum, t) => sum! + t.amount),
     );
 
-    _updateMonthData(yearObj!, month, monthObj);
+    _updateMonthData(yearObj, month, monthObj);
   }
 
   void updateCategory({
@@ -177,9 +186,8 @@ class BudgetProvider extends ChangeNotifier {
     required int categoryId,
     required double newBudget,
   }) {
-    final yearObj = _years.firstWhereOrNull((y) => y.year == year);
-    final monthObj = yearObj?.months[month];
-    if (monthObj == null) return;
+    final yearObj = _getOrAddYear(year);
+    var monthObj = yearObj.months[month] ?? _generateMonthFromSettings(month);
 
     final catIndex = monthObj.categories.indexWhere((c) => c.id == categoryId);
     if (catIndex == -1) return;
@@ -188,7 +196,7 @@ class BudgetProvider extends ChangeNotifier {
       monthlyBudget: newBudget,
     );
 
-    _updateMonthData(yearObj!, month, monthObj);
+    _updateMonthData(yearObj, month, monthObj);
   }
 
   void deleteCategory({
@@ -196,13 +204,12 @@ class BudgetProvider extends ChangeNotifier {
     required int month,
     required int categoryId,
   }) {
-    final yearObj = _years.firstWhereOrNull((y) => y.year == year);
-    final monthObj = yearObj?.months[month];
-    if (monthObj == null) return;
+    final yearObj = _getOrAddYear(year);
+    var monthObj = yearObj.months[month] ?? _generateMonthFromSettings(month);
 
     monthObj.categories.removeWhere((c) => c.id == categoryId);
 
-    _updateMonthData(yearObj!, month, monthObj);
+    _updateMonthData(yearObj, month, monthObj);
   }
 
   void updateMonthIncome({
@@ -213,11 +220,9 @@ class BudgetProvider extends ChangeNotifier {
     final yearObj = _years.firstWhereOrNull((y) => y.year == year);
     final monthObj = yearObj?.months[month];
 
-    if (monthObj != null) {
-      yearObj?.months[month] = monthObj.copyWith(income: newIncome);
-      notifyListeners();
-      saveData();
-    }
+    yearObj?.months[month] = monthObj!.copyWith(income: newIncome);
+    notifyListeners();
+    saveData();
   }
 
   MonthModel _generateMonthFromSettings(int monthNumber) {
@@ -248,10 +253,9 @@ class BudgetProvider extends ChangeNotifier {
     return File('${directory.path}/budget_data.json');
   }
 
-
   YearModel getYear(int yearNumber) {
     return _years.firstWhere(
-          (y) => y.year == yearNumber,
+      (y) => y.year == yearNumber,
       orElse: () => YearModel(year: yearNumber, months: {}),
     );
   }
